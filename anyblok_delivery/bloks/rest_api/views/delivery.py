@@ -1,6 +1,7 @@
-from anyblok_pyramid_rest_api.validator import (
-    model_schema_validator, full_validator)
-from anyblok_pyramid_rest_api.crud_resource import CrudResource, get
+from cornice.resource import resource
+
+from anyblok_pyramid_rest_api.validator import model_schema_validator
+from anyblok_pyramid_rest_api.crud_resource import CrudResource
 from anyblok_pyramid import current_blok
 
 
