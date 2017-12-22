@@ -1,10 +1,11 @@
 """Delivery model
 """
 from uuid import uuid1
+from datetime import datetime
 
 from anyblok.config import Configuration
 from anyblok import Declarations
-from anyblok.column import String, DateTime, UUID, Selection
+from anyblok.column import DateTime, UUID
 
 from logging import getLogger
 
