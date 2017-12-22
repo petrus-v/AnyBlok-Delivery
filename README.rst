@@ -1,8 +1,8 @@
 ==============
-Anyblok Device
+Anyblok Delivery
 ==============
 
-Device management
+Delivery management
 
 
 

@@ -1,9 +1,9 @@
-.. Anyblok Device documentation master file, created by
+.. Anyblok Delivery documentation master file, created by
    sphinx-quickstart on Fri Sep 22 12:52:36 2017.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Anyblok Device's documentation!
+Welcome to Anyblok Delivery's documentation!
 ==========================================
 
 .. toctree::

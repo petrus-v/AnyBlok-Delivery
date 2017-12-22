@@ -41,8 +41,8 @@ setup(
     packages=find_packages(),
     entry_points={
         'bloks': [
-            'delivery=anyblok_delivery.bloks.delivery:DeviceBlok',
-            'delivery_rest_api=anyblok_delivery.bloks.rest_api:DeviceRestApiBlok',
+            'delivery=anyblok_delivery.bloks.delivery:DeliveryBlok',
+            'delivery_rest_api=anyblok_delivery.bloks.rest_api:DeliveryRestApiBlok',
         ],
     },
     include_package_data=True,
