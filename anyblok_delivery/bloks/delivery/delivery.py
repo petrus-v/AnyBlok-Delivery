@@ -1,5 +1,7 @@
 """Delivery model
 """
+from uuid import uuid1
+
 from anyblok.config import Configuration
 from anyblok import Declarations
 from anyblok.column import String, DateTime, UUID, Selection
