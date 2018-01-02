@@ -6,7 +6,7 @@ from datetime import datetime
 from pycountry import countries
 
 from anyblok import Declarations
-from anyblok.column import DateTime, UUID, String, Selection
+from anyblok.column import DateTime, UUID, String, Selection, Password
 from anyblok.relationship import Many2One
 
 
