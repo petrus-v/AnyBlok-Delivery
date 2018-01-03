@@ -71,9 +71,14 @@ class CarrierService(Mixin.UuidColumn, TrackModel):
     """ Carrier service
     """
     name = String(label="Name", unique=True, nullable=False)
-    carrier = Many2One(model=Declarations.Model.Carrier, nullable=False)
-    credential = Many2One(model=Declarations.Model.CarrierCredential,
-                           nullable=False)
+    carrier = Many2One(label="Name",
+                       model=Declarations.Model.Carrier,
+                       one2many='services',
+                       nullable=False)
+    credential = Many2One(label="Credential",
+                          model=Declarations.Model.CarrierCredential,
+                          one2many='services',
+                          nullable=False)
 
     def __str__(self):
         return ('{self.name}').format(self=self)
@@ -97,7 +102,7 @@ class Address(Mixin.UuidColumn, TrackModel):
     street3 = String(label="Street line 3")
     zip_code = String(label="Postal Code")
     state = String(label="State")
-    city = Many2One(model=Declarations.Model.City, nullable=False)
+    city = String(label="City", nullable=False)
     country = Selection(label="country", selections=countries, nullable=False)
     phone1 = String(label="Phone 1")
     phone2 = String(label="Phone 2")
@@ -122,14 +127,16 @@ class Shipment(Mixin.UuidColumn, TrackModel):
 
     service = Many2One(label="Shipping service",
                        model=Declarations.Model.CarrierService,
+                       one2many='shipments',
                        nullable=False)
     sender_address = Many2One(label="Sender address",
                               model=Declarations.Model.Address,
+                              column_names=["sender_address_uuid"],
                               nullable=False)
     recipient_address = Many2One(label="Recipient address",
                                  model=Declarations.Model.Address,
+                                 column_names=["recipient_address_uuid"],
                                  nullable=False)
-    service = Many2One(model=Declarations.Model.Address, nullable=False)
     status = Selection(label="Shipping status", selections=statuses,
                        nullable=False)
 
