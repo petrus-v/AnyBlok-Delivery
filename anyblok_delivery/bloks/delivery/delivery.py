@@ -112,8 +112,8 @@ class Address(Mixin.UuidColumn, TrackModel):
         return ('{self.uuid}').format(self=self)
 
     def __repr__(self):
-        msg = ('<Address: {self.uuid}, {self.contact_name},'
-               '{self.company_name}>')
+        msg = ('<Address: {self.uuid}, {self.contact_name}, '
+               '{self.company_name}, {self.zip_code}, {self.country}>')
 
         return msg.format(self=self)
 
@@ -138,6 +138,7 @@ class Shipment(Mixin.UuidColumn, TrackModel):
                                  column_names=["recipient_address_uuid"],
                                  nullable=False)
     status = Selection(label="Shipping status", selections=statuses,
+                       default='new',
                        nullable=False)
 
     def __str__(self):
