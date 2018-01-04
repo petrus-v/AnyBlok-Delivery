@@ -9,7 +9,7 @@ from anyblok import Declarations
 from anyblok.column import DateTime, UUID, String, Selection, Password
 from anyblok.relationship import Many2One
 
-
+from .fields import Jsonb
 from logging import getLogger
 
 
@@ -79,6 +79,7 @@ class CarrierService(Mixin.UuidColumn, TrackModel):
                           model=Declarations.Model.CarrierCredential,
                           one2many='services',
                           nullable=False)
+    properties = Jsonb(label="Properties")
 
     def __str__(self):
         return ('{self.name}').format(self=self)
@@ -140,6 +141,7 @@ class Shipment(Mixin.UuidColumn, TrackModel):
     status = Selection(label="Shipping status", selections=statuses,
                        default='new',
                        nullable=False)
+    properties = Jsonb(label="Properties")
 
     def __str__(self):
         return ('{self.uuid}').format(self=self)
