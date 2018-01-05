@@ -34,62 +34,6 @@ class TrackModel:
                          auto_update=True)
 
 
-@Declarations.register(Model)
-class Carrier(Mixin.UuidColumn, TrackModel):
-    """ Carrier model
-    """
-    name = String(label="Name", unique=True, nullable=False)
-
-    def __str__(self):
-        return ('{self.name}').format(self=self)
-
-    def __repr__(self):
-        msg = ('<Carrier: {self.name}>')
-
-        return msg.format(self=self)
-
-
-@Declarations.register(Model)
-class CarrierCredential(Mixin.UuidColumn, TrackModel):
-    """ Store carrier credentials
-    """
-    account_number = String(label="Account Number")
-    password = Password(crypt_context={'schemes': ['pbkdf2_sha512']},
-                        nullable=False)
-
-    def __str__(self):
-        return ('{self.account_number}').format(self=self)
-
-    def __repr__(self):
-        msg = ('<CarrierApiCredentials: {self.account_number}>')
-
-        return msg.format(self=self)
-
-
-@Declarations.register(Model)
-class CarrierService(Mixin.UuidColumn, TrackModel):
-    """ Carrier service
-    """
-    name = String(label="Name", unique=True, nullable=False)
-    carrier = Many2One(label="Name",
-                       model=Declarations.Model.Carrier,
-                       one2many='services',
-                       nullable=False)
-    credential = Many2One(label="Credential",
-                          model=Declarations.Model.CarrierCredential,
-                          one2many='services',
-                          nullable=False)
-    properties = Jsonb(label="Properties")
-
-    def __str__(self):
-        return ('{self.name}').format(self=self)
-
-    def __repr__(self):
-        msg = ('<CarrierService: {self.name}>')
-
-        return msg.format(self=self)
-
-
 @Declarations.register(Declarations.Model)
 class Address(Mixin.UuidColumn, TrackModel):
     """ Postal address for delivery
@@ -104,7 +48,7 @@ class Address(Mixin.UuidColumn, TrackModel):
     zip_code = String(label="Postal Code")
     state = String(label="State")
     city = String(label="City", nullable=False)
-    country = Selection(label="country", selections=countries, nullable=False)
+    country = Selection(label="Country", selections=countries, nullable=False)
     phone1 = String(label="Phone 1")
     phone2 = String(label="Phone 2")
     email = String(label="Email")
@@ -120,14 +64,100 @@ class Address(Mixin.UuidColumn, TrackModel):
 
 
 @Declarations.register(Model)
+class Carrier(Mixin.UuidColumn, TrackModel):
+    """ 'Model.Carrier' namespace
+    """
+    name = String(label="Name", nullable=False)
+    code = String(label="Code", unique=True, nullable=False)
+
+    def __str__(self):
+        return ('{self.name}').format(self=self)
+
+    def __repr__(self):
+        msg = ('<Carrier: {self.name} - {self.code}>')
+
+        return msg.format(self=self)
+
+
+@Declarations.register(Model.Carrier)
+class Credential(Mixin.UuidColumn, TrackModel):
+    """ Store carrier credentials
+    Model.Carrier.Credential
+    """
+    account_number = String(label="Account Number")
+    password = Password(crypt_context={'schemes': ['pbkdf2_sha512']},
+                        nullable=False)
+
+    def __str__(self):
+        return ('{self.account_number}').format(self=self)
+
+    def __repr__(self):
+        msg = ('<Carrier.Credential: {self.account_number}>')
+
+        return msg.format(self=self)
+
+
+@Declarations.register(Model.Carrier)
+class Service(Mixin.UuidColumn, TrackModel):
+    """ Carrier service
+    Model.Carrier.Service
+    """
+    CARRIER_CODE = None
+
+    name = String(label="Name", unique=True, nullable=False)
+    carrier = Many2One(label="Name",
+                       model=Declarations.Model.Carrier,
+                       one2many='services',
+                       nullable=False)
+    credential = Many2One(label="Credential",
+                          model=Declarations.Model.Carrier.Credential,
+                          one2many='services',
+                          nullable=False)
+    properties = Jsonb(label="Properties")
+
+    def __str__(self):
+        return ('{self.name}').format(self=self)
+
+    def __repr__(self):
+        msg = ('<Carrier.Service: {self.name}>')
+
+        return msg.format(self=self)
+
+    @classmethod
+    def query(cls, *args, **kwargs):
+        query = super(Service, cls).query(*args, **kwargs)
+        if cls.__registry_name__.startswith('Model.Carrier.Service.'):
+            carrier = cls.registry.Carrier.query().filter_by(
+                code=cls.CARRIER_CODE).first()
+            query = query.filter(cls.carrier == carrier)
+
+        return query
+
+
+@Declarations.register(Model.Carrier.Service)
+class Colissimo(Model.Carrier.Service):
+    """ Carrier service
+    Model.Carrier.Service.Colissimo
+    """
+    CARRIER_CODE = "COLISSIMO"
+
+
+@Declarations.register(Model.Carrier.Service)
+class Dhl(Model.Carrier.Service):
+    """ Carrier service
+    Model.Carrier.Service.Dhl
+    """
+    CARRIER_CODE = "DHL"
+
+
+@Declarations.register(Model)
 class Shipment(Mixin.UuidColumn, TrackModel):
     """ Shipment
     """
     statuses = dict(new="New", label="Label", transit="Transit",
                     delivered="Delivered", exception="Exception")
-
     service = Many2One(label="Shipping service",
-                       model=Declarations.Model.CarrierService,
+                       model=Declarations.Model.Carrier.Service,
                        one2many='shipments',
                        nullable=False)
     sender_address = Many2One(label="Sender address",

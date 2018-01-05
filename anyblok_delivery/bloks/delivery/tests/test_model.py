@@ -4,12 +4,12 @@ from anyblok.tests.testcase import BlokTestCase
 class TestDeliveryModel(BlokTestCase):
     """ Test delivery model"""
 
-    def create_carrier_service(self):
-        ca = self.registry.Carrier.insert(name="Colissimo")
-        ca_cred = self.registry.CarrierCredential.insert(
+    def create_carrier_service_colissimo(self):
+        ca = self.registry.Carrier.insert(name="Colissimo", code="COLISSIMO")
+        ca_cred = self.registry.Carrier.Credential.insert(
                     account_number="123456",
                     password="password")
-        service = self.registry.CarrierService.insert(
+        service = self.registry.Carrier.Service.insert(
                     name="DOM", carrier=ca, credential=ca_cred)
         return service
 
@@ -34,11 +34,39 @@ class TestDeliveryModel(BlokTestCase):
             )
         return address
 
-    def test_carrier_service(self):
-        colissimo = self.create_carrier_service()
+    def test_carrier_service_colissimo(self):
+        colissimo = self.create_carrier_service_colissimo()
+        self.assertEqual(
+            colissimo.carrier.code,
+            "COLISSIMO"
+        )
+
+        self.assertEqual(
+            len(self.registry.Carrier.Service.query().all()),
+            1
+        )
+        self.assertEqual(
+            len(self.registry.Carrier.Service.Colissimo.query().all()),
+            1
+        )
+        self.assertEqual(
+            len(self.registry.Carrier.Service.Dhl.query().all()),
+            0
+        )
+
+    def test_carrier_service_colissimo_shipment(self):
+        colissimo = self.create_carrier_service_colissimo()
         sender_address = self.create_sender_address()
         recipient_address = self.create_recipient_address()
         shipment = self.registry.Shipment.insert(
                 service=colissimo, sender_address=sender_address,
                 recipient_address=recipient_address)
-        self.assertEqual(shipment.service.name, "DOM")
+
+        self.assertEqual(
+            shipment.service.carrier.code,
+            "COLISSIMO"
+        )
+        self.assertEqual(
+            shipment.service.name,
+            "DOM"
+        )
