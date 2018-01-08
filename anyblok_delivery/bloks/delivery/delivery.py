@@ -2,15 +2,21 @@
 """
 from uuid import uuid1
 from datetime import datetime
+from logging import getLogger
 
 from pycountry import countries
 
 from anyblok import Declarations
-from anyblok.column import DateTime, UUID, String, Selection, Password
+from anyblok.column import (
+    DateTime,
+    UUID,
+    String,
+    Selection,
+    Password
+)
 from anyblok.relationship import Many2One
 
 from .fields import Jsonb
-from logging import getLogger
 
 
 logger = getLogger(__name__)
@@ -35,7 +41,7 @@ class TrackModel:
 
 
 @Declarations.register(Declarations.Model)
-class Address(Mixin.UuidColumn, TrackModel):
+class Address(Mixin.UuidColumn, Mixin.TrackModel):
     """ Postal address for delivery
     """
     countries = dict((country.alpha_3, country.name) for country in countries)
@@ -64,7 +70,7 @@ class Address(Mixin.UuidColumn, TrackModel):
 
 
 @Declarations.register(Model)
-class Carrier(Mixin.UuidColumn, TrackModel):
+class Carrier(Mixin.UuidColumn, Mixin.TrackModel):
     """ 'Model.Carrier' namespace
     """
     name = String(label="Name", nullable=False)
@@ -80,7 +86,7 @@ class Carrier(Mixin.UuidColumn, TrackModel):
 
 
 @Declarations.register(Model.Carrier)
-class Credential(Mixin.UuidColumn, TrackModel):
+class Credential(Mixin.UuidColumn, Mixin.TrackModel):
     """ Store carrier credentials
     Model.Carrier.Credential
     """
@@ -103,6 +109,7 @@ class Service(Mixin.UuidColumn, TrackModel):
     Model.Carrier.Service
     """
     CARRIER_CODE = None
+    carriers = dict(COLISSIMO="Colissimo", DHL="Dhl")
 
     name = String(label="Name", unique=True, nullable=False)
     carrier = Many2One(label="Name",
@@ -114,6 +121,10 @@ class Service(Mixin.UuidColumn, TrackModel):
                           one2many='services',
                           nullable=False)
     properties = Jsonb(label="Properties")
+    carrier_code = Selection(selections=carriers)
+
+    def get_carrier_code(self):
+        return self.CARRIER_CODE
 
     def __str__(self):
         return ('{self.name}').format(self=self)
@@ -124,30 +135,54 @@ class Service(Mixin.UuidColumn, TrackModel):
         return msg.format(self=self)
 
     @classmethod
+    def insert(cls, *args, **kwargs):
+        if cls.__registry_name__.startswith('Model.Carrier.Service.'):
+            if not kwargs.get('carrier_code'):
+                kwargs['carrier_code'] = cls.CARRIER_CODE
+
+        return super(Service, cls).insert(*args, **kwargs)
+
+    @classmethod
+    def define_mapper_args(cls):
+        mapper_args = super(Service, cls).define_mapper_args()
+        if cls.__registry_name__ == 'Model.Carrier.Service':
+            mapper_args.update({'polymorphic_on': cls.carrier_code})
+
+        mapper_args.update({'polymorphic_identity': cls.CARRIER_CODE})
+        return mapper_args
+
+    @classmethod
     def query(cls, *args, **kwargs):
         query = super(Service, cls).query(*args, **kwargs)
         if cls.__registry_name__.startswith('Model.Carrier.Service.'):
-            carrier = cls.registry.Carrier.query().filter_by(
-                code=cls.CARRIER_CODE).first()
-            query = query.filter(cls.carrier == carrier)
+            query = query.filter(cls.carrier_code == cls.CARRIER_CODE)
 
         return query
 
+    def create_label(self, *args, **kwargs):
+        pass
 
-@Declarations.register(Model.Carrier.Service)
+
+@Declarations.register(Model.Carrier.Service, tablename=Model.Carrier.Service)
 class Colissimo(Model.Carrier.Service):
     """ Carrier service
     Model.Carrier.Service.Colissimo
     """
     CARRIER_CODE = "COLISSIMO"
 
+    def create_label(self, *args, **kwargs):
+        return "Colissimo create_label"
 
-@Declarations.register(Model.Carrier.Service)
+
+@Declarations.register(Model.Carrier.Service, tablename=Model.Carrier.Service)
 class Dhl(Model.Carrier.Service):
     """ Carrier service
     Model.Carrier.Service.Dhl
     """
     CARRIER_CODE = "DHL"
+
+    def create_label(self, *args, **kwargs):
+        return "Dhl create_label"
 
 
 @Declarations.register(Model)
@@ -180,3 +215,12 @@ class Shipment(Mixin.UuidColumn, TrackModel):
         msg = ('<Shipment: {self.uuid}>')
 
         return msg.format(self=self)
+
+    def create_label(self):
+        """Retrieve a shipping label from shipping service
+        """
+        if not self.service:
+            return
+        if not self.status == 'new':
+            return
+        return self.service.create_label(self)

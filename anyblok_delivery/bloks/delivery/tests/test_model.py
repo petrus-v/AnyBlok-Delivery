@@ -9,7 +9,7 @@ class TestDeliveryModel(BlokTestCase):
         ca_cred = self.registry.Carrier.Credential.insert(
                     account_number="123456",
                     password="password")
-        service = self.registry.Carrier.Service.insert(
+        service = self.registry.Carrier.Service.Colissimo.insert(
                     name="DOM", carrier=ca, credential=ca_cred)
         return service
 
@@ -69,4 +69,8 @@ class TestDeliveryModel(BlokTestCase):
         self.assertEqual(
             shipment.service.name,
             "DOM"
+        )
+        self.assertEqual(
+            shipment.create_label(),
+            "Colissimo create_label"
         )
