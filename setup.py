@@ -46,6 +46,7 @@ setup(
         'bloks': [
             'delivery=anyblok_delivery.bloks.delivery:DeliveryBlok',
             'delivery_rest_api=anyblok_delivery.bloks.rest_api:DeliveryRestApiBlok',
+            'delivery_colissimo=anyblok_delivery.bloks.colissimo:DeliveryColissimoBlok',
         ],
     },
     include_package_data=True,

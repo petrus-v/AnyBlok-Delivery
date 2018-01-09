@@ -122,14 +122,13 @@ class Service(Mixin.UuidColumn, TrackModel):
                           one2many='services',
                           nullable=False)
     properties = Jsonb(label="Properties")
-    carrier_code = Selection(selections=carriers)
+    carrier_code = Selection(selections='get_carriers')
 
     def __str__(self):
         return ('{self.name}').format(self=self)
 
     def __repr__(self):
         msg = ('<Carrier.Service: {self.name}>')
-
         return msg.format(self=self)
 
     @classmethod
@@ -157,83 +156,13 @@ class Service(Mixin.UuidColumn, TrackModel):
 
         return query
 
-    def create_label(self, *args, **kwargs):
-        pass
-
-
-@Declarations.register(Model.Carrier.Service, tablename=Model.Carrier.Service)
-class Colissimo(Model.Carrier.Service):
-    """ Carrier service
-    Model.Carrier.Service.Colissimo
-    """
-    CARRIER_CODE = "COLISSIMO"
-    base_url = "https://ws.colissimo.fr/sls-ws/SlsServiceWSRest/generateLabel"
+    def get_carriers(self):
+        return dict()
 
     def create_label(self, *args, **kwargs):
-        sh = kwargs.get('shipment', None)
-
-        deposit_date = datetime.now().strftime("%Y-%m-%d")
-        data = {"contractNumber": "%s" % self.credential.account_number,
-                "password": "%s" % self.credential.password,
-                "outputFormat": {
-                    "x": "0",
-                    "y": "0",
-                    "outputPrintingType": "PDF_A4_300dpi"
-                    },
-                "letter": {
-                    "service": {
-                        "productCode": "%s" % self.product_code,
-                        "depositDate": "%s" % deposit_date,
-                        },
-                    "parcel": {
-                        "weight": "1"
-                        },
-                    "sender": {
-                        "address": {
-                            "companyName": "%s" %
-                            sh.sender_address.company_name,
-                            "firstName": "%s" % sh.sender_address.contact_name,
-                            "lastName": "%s" % sh.sender_address.contact_name,
-                            "line0": "",
-                            "line1": "",
-                            "line2": "%s" % sh.sender_address.street1,
-                            "line3": "%s" % sh.sender_address.street2,
-                            "countryCode": "%s" % sh.sender_address.country,
-                            "city": "%s" % sh.sender_address.city,
-                            "zipCode": "%s" % sh.sender_address.zip_code,
-                            }
-                        },
-                    "addressee": {
-                        "address": {
-                            "companyName": "%s" %
-                            sh.recipient_address.company_name,
-                            "firstName": "%s" %
-                            sh.recipient_address.contact_name,
-                            "lastName": "%s" %
-                            sh.recipient_address.contact_name,
-                            "line0": "",
-                            "line1": "",
-                            "line2": "%s" % sh.recipient_address.street1,
-                            "line3": "%s" % sh.recipient_address.street2,
-                            "countryCode": "%s" % sh.recipient_address.country,
-                            "city": "%s" % sh.recipient_address.city,
-                            "zipCode": "%s" % sh.recipient_address.zip_code,
-                            }
-                        }
-                    }
-                }
-        return data
-
-
-@Declarations.register(Model.Carrier.Service, tablename=Model.Carrier.Service)
-class Dhl(Model.Carrier.Service):
-    """ Carrier service
-    Model.Carrier.Service.Dhl
-    """
-    CARRIER_CODE = "DHL"
-
-    def create_label(self, *args, **kwargs):
-        return "Dhl create_label"
+        raise Exception("Creating a label directly from Carrier.Service class "
+                        "is Forbidden. Please use a specialized one like "
+                        "Colissimo, Dhl, etc...")
 
 
 @Declarations.register(Model)
