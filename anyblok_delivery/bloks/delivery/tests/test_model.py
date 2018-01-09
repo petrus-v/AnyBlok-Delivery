@@ -10,7 +10,8 @@ class TestDeliveryModel(BlokTestCase):
                     account_number="123456",
                     password="password")
         service = self.registry.Carrier.Service.Colissimo.insert(
-                    name="DOM", carrier=ca, credential=ca_cred)
+                    name="Livraison à domicile", product_code="DOM",
+                    carrier=ca, credential=ca_cred)
         return service
 
     def create_sender_address(self):
@@ -67,10 +68,10 @@ class TestDeliveryModel(BlokTestCase):
             "COLISSIMO"
         )
         self.assertEqual(
-            shipment.service.name,
+            shipment.service.product_code,
             "DOM"
         )
         self.assertEqual(
-            shipment.create_label(),
-            "Colissimo create_label"
+            type(shipment.create_label()),
+            dict
         )

@@ -111,7 +111,8 @@ class Service(Mixin.UuidColumn, TrackModel):
     CARRIER_CODE = None
     carriers = dict(COLISSIMO="Colissimo", DHL="Dhl")
 
-    name = String(label="Name", unique=True, nullable=False)
+    name = String(label="Name", nullable=False)
+    product_code = String(label="Product code", unique=True, nullable=False)
     carrier = Many2One(label="Name",
                        model=Declarations.Model.Carrier,
                        one2many='services',
@@ -122,9 +123,6 @@ class Service(Mixin.UuidColumn, TrackModel):
                           nullable=False)
     properties = Jsonb(label="Properties")
     carrier_code = Selection(selections=carriers)
-
-    def get_carrier_code(self):
-        return self.CARRIER_CODE
 
     def __str__(self):
         return ('{self.name}').format(self=self)
@@ -169,9 +167,60 @@ class Colissimo(Model.Carrier.Service):
     Model.Carrier.Service.Colissimo
     """
     CARRIER_CODE = "COLISSIMO"
+    base_url = "https://ws.colissimo.fr/sls-ws/SlsServiceWSRest/generateLabel"
 
     def create_label(self, *args, **kwargs):
-        return "Colissimo create_label"
+        shipment = kwargs.get('shipment', None)
+
+        deposit_date = datetime.now().strftime("%Y-%m-%d")
+        data = {"contractNumber":"%s" % self.credential.account_number,
+                "password":"%s" % self.credential.password,
+                "outputFormat": {
+                    "x": "0",
+                    "y": "0",
+                    "outputPrintingType": "PDF_A4_300dpi"
+                    },
+                "letter": {
+                    "service": {
+                        "productCode": "%s" % self.product_code,
+                        "depositDate": "%s" % deposit_date,
+                        },
+                    "parcel": {
+                        "weight": "1"
+                        },
+                    "sender": {
+                        "address": {
+                            "companyName": "%s" % shipment.sender_address.company_name,
+                            "firstName": "%s" % shipment.sender_address.contact_name,
+                            "lastName": "%s" % shipment.sender_address.contact_name,
+                            "line0": "",
+                            "line1": "",
+                            "line2": "%s" % shipment.sender_address.street1,
+                            "line3": "%s" % shipment.sender_address.street2,
+                            "line3": "%s" % shipment.sender_address.street2,
+                            "countryCode": "%s" % shipment.sender_address.country,
+                            "city": "%s" % shipment.sender_address.city,
+                            "zipCode": "%s" % shipment.sender_address.zip_code,
+                            }
+                        },
+                    "addressee": {
+                        "address": {
+                            "companyName": "%s" % shipment.recipient_address.company_name,
+                            "firstName": "%s" % shipment.recipient_address.contact_name,
+                            "lastName": "%s" % shipment.recipient_address.contact_name,
+                            "line0": "",
+                            "line1": "",
+                            "line2": "%s" % shipment.recipient_address.street1,
+                            "line3": "%s" % shipment.recipient_address.street2,
+                            "line3": "%s" % shipment.recipient_address.street2,
+                            "countryCode": "%s" % shipment.recipient_address.country,
+                            "city": "%s" % shipment.recipient_address.city,
+                            "zipCode": "%s" % shipment.recipient_address.zip_code,
+                            }
+                        }
+                    }
+                }
+        return data
 
 
 @Declarations.register(Model.Carrier.Service, tablename=Model.Carrier.Service)
@@ -223,4 +272,4 @@ class Shipment(Mixin.UuidColumn, TrackModel):
             return
         if not self.status == 'new':
             return
-        return self.service.create_label(self)
+        return self.service.create_label(shipment=self)
