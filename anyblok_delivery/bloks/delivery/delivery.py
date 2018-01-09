@@ -170,11 +170,11 @@ class Colissimo(Model.Carrier.Service):
     base_url = "https://ws.colissimo.fr/sls-ws/SlsServiceWSRest/generateLabel"
 
     def create_label(self, *args, **kwargs):
-        shipment = kwargs.get('shipment', None)
+        sh = kwargs.get('shipment', None)
 
         deposit_date = datetime.now().strftime("%Y-%m-%d")
-        data = {"contractNumber":"%s" % self.credential.account_number,
-                "password":"%s" % self.credential.password,
+        data = {"contractNumber": "%s" % self.credential.account_number,
+                "password": "%s" % self.credential.password,
                 "outputFormat": {
                     "x": "0",
                     "y": "0",
@@ -190,32 +190,34 @@ class Colissimo(Model.Carrier.Service):
                         },
                     "sender": {
                         "address": {
-                            "companyName": "%s" % shipment.sender_address.company_name,
-                            "firstName": "%s" % shipment.sender_address.contact_name,
-                            "lastName": "%s" % shipment.sender_address.contact_name,
+                            "companyName": "%s" %
+                            sh.sender_address.company_name,
+                            "firstName": "%s" % sh.sender_address.contact_name,
+                            "lastName": "%s" % sh.sender_address.contact_name,
                             "line0": "",
                             "line1": "",
-                            "line2": "%s" % shipment.sender_address.street1,
-                            "line3": "%s" % shipment.sender_address.street2,
-                            "line3": "%s" % shipment.sender_address.street2,
-                            "countryCode": "%s" % shipment.sender_address.country,
-                            "city": "%s" % shipment.sender_address.city,
-                            "zipCode": "%s" % shipment.sender_address.zip_code,
+                            "line2": "%s" % sh.sender_address.street1,
+                            "line3": "%s" % sh.sender_address.street2,
+                            "countryCode": "%s" % sh.sender_address.country,
+                            "city": "%s" % sh.sender_address.city,
+                            "zipCode": "%s" % sh.sender_address.zip_code,
                             }
                         },
                     "addressee": {
                         "address": {
-                            "companyName": "%s" % shipment.recipient_address.company_name,
-                            "firstName": "%s" % shipment.recipient_address.contact_name,
-                            "lastName": "%s" % shipment.recipient_address.contact_name,
+                            "companyName": "%s" %
+                            sh.recipient_address.company_name,
+                            "firstName": "%s" %
+                            sh.recipient_address.contact_name,
+                            "lastName": "%s" %
+                            sh.recipient_address.contact_name,
                             "line0": "",
                             "line1": "",
-                            "line2": "%s" % shipment.recipient_address.street1,
-                            "line3": "%s" % shipment.recipient_address.street2,
-                            "line3": "%s" % shipment.recipient_address.street2,
-                            "countryCode": "%s" % shipment.recipient_address.country,
-                            "city": "%s" % shipment.recipient_address.city,
-                            "zipCode": "%s" % shipment.recipient_address.zip_code,
+                            "line2": "%s" % sh.recipient_address.street1,
+                            "line3": "%s" % sh.recipient_address.street2,
+                            "countryCode": "%s" % sh.recipient_address.country,
+                            "city": "%s" % sh.recipient_address.city,
+                            "zipCode": "%s" % sh.recipient_address.zip_code,
                             }
                         }
                     }
