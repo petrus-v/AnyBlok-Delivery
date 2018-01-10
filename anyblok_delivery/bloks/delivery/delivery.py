@@ -11,8 +11,7 @@ from anyblok.column import (
     DateTime,
     UUID,
     String,
-    Selection,
-    Password
+    Selection
 )
 from anyblok.relationship import Many2One
 
@@ -91,8 +90,7 @@ class Credential(Mixin.UuidColumn, Mixin.TrackModel):
     Model.Carrier.Credential
     """
     account_number = String(label="Account Number")
-    password = Password(crypt_context={'schemes': ['pbkdf2_sha512']},
-                        nullable=False)
+    password = String(label="Password", encrypt_key=True)
 
     def __str__(self):
         return ('{self.account_number}').format(self=self)
@@ -127,7 +125,7 @@ class Service(Mixin.UuidColumn, TrackModel):
         return ('{self.name}').format(self=self)
 
     def __repr__(self):
-        msg = ('<Carrier.Service: {self.name}>')
+        msg = ('<Carrier.Service.{self.carrier_code.label}: {self.name}>')
         return msg.format(self=self)
 
     @classmethod
