@@ -109,7 +109,6 @@ class Service(Mixin.UuidColumn, TrackModel):
     Model.Carrier.Service
     """
     CARRIER_CODE = None
-    carriers = dict(COLISSIMO="Colissimo", DHL="Dhl")
 
     name = String(label="Name", nullable=False)
     product_code = String(label="Product code", unique=True, nullable=False)
@@ -156,7 +155,8 @@ class Service(Mixin.UuidColumn, TrackModel):
 
         return query
 
-    def get_carriers(self):
+    @classmethod
+    def get_carriers(cls):
         return dict()
 
     def create_label(self, *args, **kwargs):

@@ -10,6 +10,16 @@ logger = getLogger(__name__)
 Model = Declarations.Model
 
 
+@Declarations.register(Model.Carrier)
+class Service:
+
+    @classmethod
+    def get_carriers(cls):
+        res = super(Service, cls).get_carriers()
+        res.update(dict(COLISSIMO='Colissimo'))
+        return res
+
+
 @Declarations.register(Model.Carrier.Service, tablename=Model.Carrier.Service)
 class Colissimo(Model.Carrier.Service):
     """ The Colissimo Carrier service (Polymorphic model that's override
@@ -19,11 +29,6 @@ class Colissimo(Model.Carrier.Service):
     """
     CARRIER_CODE = "COLISSIMO"
     base_url = "https://ws.colissimo.fr/sls-ws/SlsServiceWSRest/generateLabel"
-
-    def get_carriers(self):
-        res = super(Colissimo, self).get_carriers()
-        res.update(dict(COLISSIMO='Colissimo'))
-        return res
 
     def get_data(self, shipment=None):
         """Transform database shipment data to colissimo conventions"""
