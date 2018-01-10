@@ -127,7 +127,7 @@ class Service(Mixin.UuidColumn, TrackModel):
         return ('{self.name}').format(self=self)
 
     def __repr__(self):
-        msg = ('<Carrier.Service: {self.name}>')
+        msg = ('<Carrier.Service.{self.carrier_code.label}: {self.name}>')
         return msg.format(self=self)
 
     @classmethod
