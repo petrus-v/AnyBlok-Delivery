@@ -11,8 +11,7 @@ from anyblok.column import (
     DateTime,
     UUID,
     String,
-    Selection,
-    Password
+    Selection
 )
 from anyblok.relationship import Many2One
 
