@@ -25,7 +25,7 @@ requirements = [
     'anyblok',
     'anyblok-pyramid-rest-api',
     'pycountry',
-    'passlib',
+    'cryptography',
     'requests'
 ]
 
