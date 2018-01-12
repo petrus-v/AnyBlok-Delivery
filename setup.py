@@ -26,7 +26,8 @@ requirements = [
     'anyblok-pyramid-rest-api',
     'pycountry',
     'cryptography',
-    'requests'
+    'requests',
+    'requests-toolbelt'
 ]
 
 test_requirements = [
