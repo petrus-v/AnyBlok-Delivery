@@ -86,6 +86,14 @@ class TestDeliveryModel(BlokTestCase):
             type(data),
             dict
         )
+        self.assertEqual(
+            data['letter']['service']['productCode'],
+            "DOM"
+        )
+        self.assertEqual(
+            data['letter']['sender']['address']['countryCode'],
+            "FR"
+        )
 
     def test_create_label(self):
         colissimo = self.create_carrier_service_colissimo()
