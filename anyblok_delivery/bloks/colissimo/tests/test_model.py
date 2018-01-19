@@ -1,3 +1,4 @@
+from unittest.mock import patch
 from anyblok.tests.testcase import BlokTestCase
 
 
@@ -6,8 +7,9 @@ class TestDeliveryModel(BlokTestCase):
 
     def create_carrier_service_colissimo(self):
         ca = self.registry.Carrier.insert(name="Colissimo", code="COLISSIMO")
+
         ca_cred = self.registry.Carrier.Credential.insert(
-                    account_number="123456",
+                    account_number="123",
                     password="password")
         service = self.registry.Carrier.Service.Colissimo.insert(
                     name="Livraison à domicile", product_code="DOM",
@@ -19,7 +21,7 @@ class TestDeliveryModel(BlokTestCase):
                 contact_name="Shipping services",
                 company_name="Acme",
                 street1="1 company street",
-                zip_code="00000", state="", city="There", country="FRA")
+                zip_code="75000", state="", city="Paris", country="FRA")
         return address
 
     def create_recipient_address(self):
@@ -28,9 +30,9 @@ class TestDeliveryModel(BlokTestCase):
                 street1="1 street",
                 street2="crossroad",
                 street3="♥",
-                zip_code="99999",
+                zip_code="66000",
                 state="A region",
-                city="Nowhere",
+                city="Perpignan",
                 country="FRA"
             )
         return address
@@ -71,3 +73,42 @@ class TestDeliveryModel(BlokTestCase):
             type(shipment.create_label()),
             dict
         )
+
+    def test_map_data(self):
+        colissimo = self.create_carrier_service_colissimo()
+        sender_address = self.create_sender_address()
+        recipient_address = self.create_recipient_address()
+        shipment = self.registry.Shipment.insert(
+                service=colissimo, sender_address=sender_address,
+                recipient_address=recipient_address)
+        data = shipment.service.map_data(shipment=shipment)
+        self.assertEqual(
+            type(data),
+            dict
+        )
+        self.assertEqual(
+            data['letter']['service']['productCode'],
+            "DOM"
+        )
+        self.assertEqual(
+            data['letter']['sender']['address']['countryCode'],
+            "FR"
+        )
+
+    def test_create_label(self):
+        colissimo = self.create_carrier_service_colissimo()
+        sender_address = self.create_sender_address()
+        recipient_address = self.create_recipient_address()
+        shipment = self.registry.Shipment.insert(
+                service=colissimo, sender_address=sender_address,
+                recipient_address=recipient_address)
+
+        with patch('anyblok_delivery.bloks.colissimo.colissimo.Colissimo'
+                   '.create_label') as mock_post:
+            mock_post.return_value = dict(status_code=200)
+            response = shipment.create_label()
+
+            self.assertEqual(
+                response['status_code'],
+                200
+            )

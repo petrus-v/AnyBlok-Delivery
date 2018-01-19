@@ -1,7 +1,12 @@
 """Colissimo Carrier Classes
 """
+import json
 from datetime import datetime
 from logging import getLogger
+
+import requests
+from requests_toolbelt.multipart import decoder
+from pycountry import countries
 
 from anyblok import Declarations
 
@@ -28,12 +33,22 @@ class Colissimo(Model.Carrier.Service):
     Namespace : Model.Carrier.Service.Colissimo
     """
     CARRIER_CODE = "COLISSIMO"
-    base_url = "https://ws.colissimo.fr/sls-ws/SlsServiceWSRest/generateLabel"
 
-    def get_data(self, shipment=None):
-        """Transform database shipment data to colissimo conventions"""
+    def map_data(self, shipment=None):
+        """Given a shipment object, transform its data to Colissimo
+        specifications"""
+        if not shipment:
+            raise Exception("You must pass a shipment object to map_data")
+
         sh = shipment
+        # datetime formatting
         deposit_date = datetime.now().strftime("%Y-%m-%d")
+        # 2 letters country code
+        sender_country = countries.get(
+                alpha_3=sh.sender_address.country).alpha_2
+        recipient_country = countries.get(
+                alpha_3=sh.recipient_address.country).alpha_2
+
         data = {"contractNumber": "%s" % self.credential.account_number,
                 "password": "%s" % self.credential.password,
                 "outputFormat": {
@@ -59,7 +74,7 @@ class Colissimo(Model.Carrier.Service):
                             "line1": "",
                             "line2": "%s" % sh.sender_address.street1,
                             "line3": "%s" % sh.sender_address.street2,
-                            "countryCode": "%s" % sh.sender_address.country,
+                            "countryCode": "%s" % sender_country,
                             "city": "%s" % sh.sender_address.city,
                             "zipCode": "%s" % sh.sender_address.zip_code,
                             }
@@ -76,7 +91,7 @@ class Colissimo(Model.Carrier.Service):
                             "line1": "",
                             "line2": "%s" % sh.recipient_address.street1,
                             "line3": "%s" % sh.recipient_address.street2,
-                            "countryCode": "%s" % sh.recipient_address.country,
+                            "countryCode": "%s" % recipient_country,
                             "city": "%s" % sh.recipient_address.city,
                             "zipCode": "%s" % sh.recipient_address.zip_code,
                             }
@@ -86,5 +101,34 @@ class Colissimo(Model.Carrier.Service):
         return data
 
     def create_label(self, shipment=None):
-        data = self.get_data(shipment)
-        return data
+        url = \
+            "https://ws.colissimo.fr/sls-ws/SlsServiceWSRest/generateLabel"
+        data = self.map_data(shipment)
+        req = requests.post(url, json=data)
+        res = dict()
+
+        # Parse multipart response
+        multipart_data = decoder.MultipartDecoder.from_response(req)
+        pdf = b''
+        infos = dict()
+
+        for part in multipart_data.parts:
+            head = dict((item[0].decode(), item[1].decode()) for
+                        item in part.headers.lower_items())
+            if ("content-type" in head.keys() and
+                head.get('content-type', None) ==
+                    "application/octet-stream"):
+                pdf = part.content
+            elif ("content-type" in head.keys() and
+                  head.get('content-type', None).startswith(
+                      "application/json")):
+                infos = json.loads(part.content.decode())
+
+        if req.status_code == 400:
+            res['errors'] = infos['messages']
+        elif req.status_code == 200:
+            res['infos'] = infos
+            res['pdf'] = pdf
+
+        res['status_code'] = req.status_code
+        return res
