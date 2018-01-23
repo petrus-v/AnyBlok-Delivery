@@ -53,8 +53,8 @@ class Colissimo(Model.Carrier.Service):
                         "address": {
                             "companyName": "%s" %
                             sh.sender_address.company_name,
-                            "firstName": "%s" % sh.sender_address.contact_name,
-                            "lastName": "%s" % sh.sender_address.contact_name,
+                            "firstName": "%s" % sh.sender_address.first_name,
+                            "lastName": "%s" % sh.sender_address.last_name,
                             "line0": "",
                             "line1": "",
                             "line2": "%s" % sh.sender_address.street1,
@@ -69,9 +69,9 @@ class Colissimo(Model.Carrier.Service):
                             "companyName": "%s" %
                             sh.recipient_address.company_name,
                             "firstName": "%s" %
-                            sh.recipient_address.contact_name,
+                            sh.recipient_address.first_name,
                             "lastName": "%s" %
-                            sh.recipient_address.contact_name,
+                            sh.recipient_address.last_name,
                             "line0": "",
                             "line1": "",
                             "line2": "%s" % sh.recipient_address.street1,
