@@ -6,7 +6,8 @@ class TestDeliveryModel(BlokTestCase):
 
     def create_sender_address(self):
         address = self.registry.Address.insert(
-                contact_name="Shipping services",
+                first_name="Shipping",
+                last_name="services",
                 company_name="Acme",
                 street1="1 company street",
                 zip_code="00000", state="", city="There", country="FRA")
@@ -14,7 +15,8 @@ class TestDeliveryModel(BlokTestCase):
 
     def create_recipient_address(self):
         address = self.registry.Address.insert(
-                contact_name="Jon Doe",
+                first_name="Jon",
+                last_name="Doe",
                 street1="1 street",
                 street2="crossroad",
                 street3="♥",
