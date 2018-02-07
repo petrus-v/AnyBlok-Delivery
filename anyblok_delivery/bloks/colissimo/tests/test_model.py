@@ -6,7 +6,8 @@ class TestDeliveryModel(BlokTestCase):
     """ Test delivery model"""
 
     def create_carrier_service_colissimo(self):
-        ca = self.registry.Delivery.Carrier.insert(name="Colissimo", code="COLISSIMO")
+        ca = self.registry.Delivery.Carrier.insert(
+            name="Colissimo", code="COLISSIMO")
 
         ca_cred = self.registry.Delivery.Carrier.Credential.insert(
                     account_number="123",
@@ -51,7 +52,8 @@ class TestDeliveryModel(BlokTestCase):
             1
         )
         self.assertEqual(
-            len(self.registry.Delivery.Carrier.Service.Colissimo.query().all()),
+            len(self.registry.Delivery.Carrier.Service.Colissimo.query(
+            ).all()),
             1
         )
 
