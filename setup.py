@@ -25,6 +25,7 @@ requirements = [
     'anyblok',
     'anyblok_postgres',
     'anyblok-pyramid-rest-api',
+    'anyblok_attachment',
     'pycountry',
     'cryptography',
     'requests',
@@ -34,6 +35,15 @@ requirements = [
 test_requirements = [
     # TODO: put package test requirements here
 ]
+
+bloks = [
+    'delivery=anyblok_delivery.bloks.delivery:DeliveryBlok',
+    'delivery_rest_api=anyblok_delivery.bloks.rest_api:DeliveryRestApiBlok',
+    (
+        'delivery_colissimo=anyblok_delivery.bloks.colissimo:'
+        'DeliveryColissimoBlok'
+    ),
+],
 
 setup(
     name='anyblok_delivery',
@@ -45,11 +55,7 @@ setup(
     url='https://github.com/franckbret/anyblok_delivery',
     packages=find_packages(),
     entry_points={
-        'bloks': [
-            'delivery=anyblok_delivery.bloks.delivery:DeliveryBlok',
-            'delivery_rest_api=anyblok_delivery.bloks.rest_api:DeliveryRestApiBlok',
-            'delivery_colissimo=anyblok_delivery.bloks.colissimo:DeliveryColissimoBlok',
-        ],
+        'bloks': bloks,
     },
     include_package_data=True,
     install_requires=requirements,

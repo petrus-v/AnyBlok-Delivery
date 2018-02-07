@@ -14,7 +14,9 @@ from anyblok.column import (
     Selection
 )
 from anyblok.relationship import Many2One
+from anyblok.field import Function
 from anyblok_postgres.column import Jsonb
+import hashlib
 
 
 logger = getLogger(__name__)
@@ -134,14 +136,6 @@ class Service(Mixin.UuidColumn, Mixin.TrackModel):
         return msg.format(self=self)
 
     @classmethod
-    def insert(cls, *args, **kwargs):
-        if cls.__registry_name__.startswith('Model.Delivery.Carrier.Service.'):
-            if not kwargs.get('carrier_code'):
-                kwargs['carrier_code'] = cls.CARRIER_CODE
-
-        return super(Service, cls).insert(*args, **kwargs)
-
-    @classmethod
     def define_mapper_args(cls):
         mapper_args = super(Service, cls).define_mapper_args()
         if cls.__registry_name__ == 'Model.Delivery.Carrier.Service':
@@ -190,6 +184,14 @@ class Shipment(Mixin.UuidColumn, TrackModel):
                        default='new',
                        nullable=False)
     properties = Jsonb(label="Properties")
+    tracking_number = String()
+    document_uuid = UUID()
+    document = Function(fget='get_latest_document')
+
+    def get_latest_document(self):
+        Document = self.registry.Attachment.Document.Latest
+        query = Document.query().filter_by(uuid=self.document_uuid)
+        return query.one_or_none()
 
     def __str__(self):
         return ('{self.uuid}').format(self=self)
@@ -207,3 +209,20 @@ class Shipment(Mixin.UuidColumn, TrackModel):
         if not self.status == 'new':
             return
         return self.service.create_label(shipment=self)
+
+    def save_document(self, binary_file, content_type):
+        document = self.document
+        if document is None:
+            document = self.registry.Attachment.Document.insert(
+                data={'shipment': str(self.uuid)}
+            )
+            self.document_uuid = document.uuid
+
+        document.file = binary_file
+        document.filesize = len(binary_file)
+        document.contenttype = content_type
+        hash = hashlib.sha256()
+        hash.update(binary_file)
+        document.hash = hash.digest()
+
+        self.registry.flush()  # flush to update version in document

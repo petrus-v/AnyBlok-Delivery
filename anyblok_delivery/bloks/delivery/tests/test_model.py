@@ -1,4 +1,6 @@
 from anyblok.tests.testcase import BlokTestCase
+from os import urandom
+from uuid import uuid1
 
 
 class TestDeliveryModel(BlokTestCase):
@@ -55,3 +57,76 @@ class TestDeliveryModel(BlokTestCase):
             self.registry.Address.query().filter_by(country="USA").count(),
             0
         )
+
+    def create_carrier_service(self):
+        ca = self.registry.Delivery.Carrier.insert(
+            name="SomeOne", code="SOMEONE")
+
+        ca_cred = self.registry.Delivery.Carrier.Credential.insert(
+                    account_number="123",
+                    password="password")
+        service = self.registry.Delivery.Carrier.Service.Colissimo.insert(
+                    name="Livraison à domicile", product_code="DOM",
+                    carrier=ca, credential=ca_cred)
+        return service
+
+    def test_save_document_new(self):
+        sender_address = self.create_sender_address()
+        recipient_address = self.create_recipient_address()
+        service = self.create_carrier_service()
+        shipment = self.registry.Delivery.Shipment.insert(
+                service=service, sender_address=sender_address,
+                recipient_address=recipient_address)
+        self.assertFalse(shipment.document)
+        binary_file = urandom(100)
+        content_type = 'application/pdf'
+        shipment.save_document(binary_file, content_type)
+        self.assertTrue(shipment.document)
+        self.assertEqual(shipment.document.file, binary_file)
+        self.assertEqual(shipment.document.contenttype, content_type)
+        self.assertEqual(shipment.document.filesize, len(binary_file))
+        self.assertTrue(shipment.document.hash)
+
+    def test_save_document_already_exist(self):
+        sender_address = self.create_sender_address()
+        recipient_address = self.create_recipient_address()
+        service = self.create_carrier_service()
+        document = self.registry.Attachment.Document.Latest.insert(
+            file=urandom(100)
+        )
+        shipment = self.registry.Delivery.Shipment.insert(
+            service=service, sender_address=sender_address,
+            recipient_address=recipient_address,
+            document_uuid=document.uuid
+        )
+        self.assertTrue(shipment.document)
+        old_version = document.version
+        binary_file = urandom(100)
+        content_type = 'application/pdf'
+        shipment.save_document(binary_file, content_type)
+        self.assertNotEqual(shipment.document.version, old_version)
+        self.assertTrue(shipment.document)
+        self.assertEqual(shipment.document.file, binary_file)
+        self.assertEqual(shipment.document.contenttype, content_type)
+        self.assertEqual(shipment.document.filesize, len(binary_file))
+        self.assertTrue(shipment.document.hash)
+
+    def test_save_document_unexisting_document(self):
+        sender_address = self.create_sender_address()
+        recipient_address = self.create_recipient_address()
+        service = self.create_carrier_service()
+        shipment = self.registry.Delivery.Shipment.insert(
+            service=service, sender_address=sender_address,
+            recipient_address=recipient_address,
+            document_uuid=uuid1()
+        )
+        self.assertTrue(shipment.document_uuid)
+        self.assertFalse(shipment.document)
+        binary_file = urandom(100)
+        content_type = 'application/pdf'
+        shipment.save_document(binary_file, content_type)
+        self.assertTrue(shipment.document)
+        self.assertEqual(shipment.document.file, binary_file)
+        self.assertEqual(shipment.document.contenttype, content_type)
+        self.assertEqual(shipment.document.filesize, len(binary_file))
+        self.assertTrue(shipment.document.hash)

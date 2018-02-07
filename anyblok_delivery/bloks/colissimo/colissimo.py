@@ -131,6 +131,15 @@ class Colissimo(Model.Delivery.Carrier.Service):
         elif req.status_code == 200:
             res['infos'] = infos
             res['pdf'] = pdf
+            shipment.save_document(
+                pdf,
+                'application/pdf'
+            )
+            shipment.properties.update({
+                'sent': data,
+                'received': infos,
+            })
+            shipment.status = 'Label'
 
         res['status_code'] = req.status_code
         return res
