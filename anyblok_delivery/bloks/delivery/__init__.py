@@ -8,6 +8,7 @@ class DeliveryBlok(Blok):
     """
     version = "0.1.0"
     author = "Franck BRET"
+    required = ['attachment']
 
     @classmethod
     def import_declaration_module(cls):
