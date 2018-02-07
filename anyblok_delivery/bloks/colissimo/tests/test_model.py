@@ -6,12 +6,13 @@ class TestDeliveryModel(BlokTestCase):
     """ Test delivery model"""
 
     def create_carrier_service_colissimo(self):
-        ca = self.registry.Carrier.insert(name="Colissimo", code="COLISSIMO")
+        ca = self.registry.Delivery.Carrier.insert(
+            name="Colissimo", code="COLISSIMO")
 
-        ca_cred = self.registry.Carrier.Credential.insert(
+        ca_cred = self.registry.Delivery.Carrier.Credential.insert(
                     account_number="123",
                     password="password")
-        service = self.registry.Carrier.Service.Colissimo.insert(
+        service = self.registry.Delivery.Carrier.Service.Colissimo.insert(
                     name="Livraison à domicile", product_code="DOM",
                     carrier=ca, credential=ca_cred)
         return service
@@ -47,11 +48,12 @@ class TestDeliveryModel(BlokTestCase):
         )
 
         self.assertEqual(
-            len(self.registry.Carrier.Service.query().all()),
+            len(self.registry.Delivery.Carrier.Service.query().all()),
             1
         )
         self.assertEqual(
-            len(self.registry.Carrier.Service.Colissimo.query().all()),
+            len(self.registry.Delivery.Carrier.Service.Colissimo.query(
+            ).all()),
             1
         )
 
@@ -59,7 +61,7 @@ class TestDeliveryModel(BlokTestCase):
         colissimo = self.create_carrier_service_colissimo()
         sender_address = self.create_sender_address()
         recipient_address = self.create_recipient_address()
-        shipment = self.registry.Shipment.insert(
+        shipment = self.registry.Delivery.Shipment.insert(
                 service=colissimo, sender_address=sender_address,
                 recipient_address=recipient_address)
 
@@ -80,7 +82,7 @@ class TestDeliveryModel(BlokTestCase):
         colissimo = self.create_carrier_service_colissimo()
         sender_address = self.create_sender_address()
         recipient_address = self.create_recipient_address()
-        shipment = self.registry.Shipment.insert(
+        shipment = self.registry.Delivery.Shipment.insert(
                 service=colissimo, sender_address=sender_address,
                 recipient_address=recipient_address)
         data = shipment.service.map_data(shipment=shipment)
@@ -101,7 +103,7 @@ class TestDeliveryModel(BlokTestCase):
         colissimo = self.create_carrier_service_colissimo()
         sender_address = self.create_sender_address()
         recipient_address = self.create_recipient_address()
-        shipment = self.registry.Shipment.insert(
+        shipment = self.registry.Delivery.Shipment.insert(
                 service=colissimo, sender_address=sender_address,
                 recipient_address=recipient_address)
 

@@ -28,7 +28,7 @@ class TestDeliveryModel(BlokTestCase):
         return address
 
     def test_credentials(self):
-        cred = self.registry.Carrier.Credential.insert(
+        cred = self.registry.Delivery.Carrier.Credential.insert(
                 account_number="test", password="xxx")
         self.assertEqual(cred.account_number, 'test')
         self.assertEqual(cred.password, 'xxx')
