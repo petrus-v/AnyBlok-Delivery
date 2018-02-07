@@ -14,8 +14,7 @@ from anyblok.column import (
     Selection
 )
 from anyblok.relationship import Many2One
-
-from .fields import Jsonb
+from anyblok_postgres.column import Jsonb
 
 
 logger = getLogger(__name__)
@@ -69,9 +68,14 @@ class Address(Mixin.UuidColumn, Mixin.TrackModel):
         return msg.format(self=self)
 
 
-@Declarations.register(Model)
+@Declarations.register(Declarations.Model)
+class Delivery:
+    """Namespace for deliveries"""
+
+
+@Declarations.register(Model.Delivery)
 class Carrier(Mixin.UuidColumn, Mixin.TrackModel):
-    """ 'Model.Carrier' namespace
+    """ 'Model.Delivery.Carrier' namespace
     """
     name = String(label="Name", nullable=False)
     code = String(label="Code", unique=True, nullable=False)
@@ -85,10 +89,10 @@ class Carrier(Mixin.UuidColumn, Mixin.TrackModel):
         return msg.format(self=self)
 
 
-@Declarations.register(Model.Carrier)
+@Declarations.register(Model.Delivery.Carrier)
 class Credential(Mixin.UuidColumn, Mixin.TrackModel):
     """ Store carrier credentials
-    Model.Carrier.Credential
+    Model.Delivery.Carrier.Credential
     """
     account_number = String(label="Account Number")
     password = String(label="Password", encrypt_key=True)
@@ -102,21 +106,21 @@ class Credential(Mixin.UuidColumn, Mixin.TrackModel):
         return msg.format(self=self)
 
 
-@Declarations.register(Model.Carrier)
-class Service(Mixin.UuidColumn, TrackModel):
+@Declarations.register(Model.Delivery.Carrier)
+class Service(Mixin.UuidColumn, Mixin.TrackModel):
     """ Carrier service
-    Model.Carrier.Service
+    Model.Delivery.Carrier.Service
     """
     CARRIER_CODE = None
 
     name = String(label="Name", nullable=False)
     product_code = String(label="Product code", unique=True, nullable=False)
     carrier = Many2One(label="Name",
-                       model=Declarations.Model.Carrier,
+                       model=Declarations.Model.Delivery.Carrier,
                        one2many='services',
                        nullable=False)
     credential = Many2One(label="Credential",
-                          model=Declarations.Model.Carrier.Credential,
+                          model=Declarations.Model.Delivery.Carrier.Credential,
                           one2many='services',
                           nullable=False)
     properties = Jsonb(label="Properties")
@@ -131,7 +135,7 @@ class Service(Mixin.UuidColumn, TrackModel):
 
     @classmethod
     def insert(cls, *args, **kwargs):
-        if cls.__registry_name__.startswith('Model.Carrier.Service.'):
+        if cls.__registry_name__.startswith('Model.Delivery.Carrier.Service.'):
             if not kwargs.get('carrier_code'):
                 kwargs['carrier_code'] = cls.CARRIER_CODE
 
@@ -140,7 +144,7 @@ class Service(Mixin.UuidColumn, TrackModel):
     @classmethod
     def define_mapper_args(cls):
         mapper_args = super(Service, cls).define_mapper_args()
-        if cls.__registry_name__ == 'Model.Carrier.Service':
+        if cls.__registry_name__ == 'Model.Delivery.Carrier.Service':
             mapper_args.update({'polymorphic_on': cls.carrier_code})
 
         mapper_args.update({'polymorphic_identity': cls.CARRIER_CODE})
@@ -149,7 +153,7 @@ class Service(Mixin.UuidColumn, TrackModel):
     @classmethod
     def query(cls, *args, **kwargs):
         query = super(Service, cls).query(*args, **kwargs)
-        if cls.__registry_name__.startswith('Model.Carrier.Service.'):
+        if cls.__registry_name__.startswith('Model.Delivery.Carrier.Service.'):
             query = query.filter(cls.carrier_code == cls.CARRIER_CODE)
 
         return query
@@ -164,14 +168,14 @@ class Service(Mixin.UuidColumn, TrackModel):
                         "Colissimo, Dhl, etc...")
 
 
-@Declarations.register(Model)
+@Declarations.register(Model.Delivery)
 class Shipment(Mixin.UuidColumn, TrackModel):
     """ Shipment
     """
     statuses = dict(new="New", label="Label", transit="Transit",
                     delivered="Delivered", exception="Exception")
     service = Many2One(label="Shipping service",
-                       model=Declarations.Model.Carrier.Service,
+                       model=Declarations.Model.Delivery.Carrier.Service,
                        one2many='shipments',
                        nullable=False)
     sender_address = Many2One(label="Sender address",

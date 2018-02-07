@@ -1,6 +1,7 @@
 sqlalchemy
 psycopg2
 git+https://github.com/AnyBlok/anyblok-pyramid-rest-api.git#egg=anyblok-pyramid-rest-api
+git+https://github.com/AnyBlok/Anyblok_Pyramid.git#egg=anyblok_pyramid
 -e .
 flake8
 coverage

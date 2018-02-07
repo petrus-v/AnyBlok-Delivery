@@ -15,7 +15,7 @@ logger = getLogger(__name__)
 Model = Declarations.Model
 
 
-@Declarations.register(Model.Carrier)
+@Declarations.register(Model.Delivery.Carrier)
 class Service:
 
     @classmethod
@@ -25,12 +25,14 @@ class Service:
         return res
 
 
-@Declarations.register(Model.Carrier.Service, tablename=Model.Carrier.Service)
-class Colissimo(Model.Carrier.Service):
+@Declarations.register(
+    Model.Delivery.Carrier.Service,
+    tablename=Model.Delivery.Carrier.Service)
+class Colissimo(Model.Delivery.Carrier.Service):
     """ The Colissimo Carrier service (Polymorphic model that's override
-    Model.Carrier.service)
+    Model.Delivery.Carrier.service)
 
-    Namespace : Model.Carrier.Service.Colissimo
+    Namespace : Model.Delivery.Carrier.Service.Colissimo
     """
     CARRIER_CODE = "COLISSIMO"
 
