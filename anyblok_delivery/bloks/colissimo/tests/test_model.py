@@ -8,10 +8,10 @@ class TestDeliveryModel(BlokTestCase):
     def create_carrier_service_colissimo(self):
         ca = self.registry.Delivery.Carrier.insert(
             name="Colissimo", code="COLISSIMO")
-
         ca_cred = self.registry.Delivery.Carrier.Credential.insert(
                     account_number="123",
                     password="password")
+
         service = self.registry.Delivery.Carrier.Service.Colissimo.insert(
                     name="Livraison à domicile", product_code="DOM",
                     carrier=ca, credential=ca_cred)
@@ -63,7 +63,9 @@ class TestDeliveryModel(BlokTestCase):
         recipient_address = self.create_recipient_address()
         shipment = self.registry.Delivery.Shipment.insert(
                 service=colissimo, sender_address=sender_address,
-                recipient_address=recipient_address)
+                recipient_address=recipient_address, reason="ORDERXXXXXXXXXX",
+                pack="PACKXXXXXXXXXX"
+                )
 
         self.assertEqual(
             shipment.service.carrier.code,
@@ -84,7 +86,9 @@ class TestDeliveryModel(BlokTestCase):
         recipient_address = self.create_recipient_address()
         shipment = self.registry.Delivery.Shipment.insert(
                 service=colissimo, sender_address=sender_address,
-                recipient_address=recipient_address)
+                recipient_address=recipient_address, reason="ORDERXXXXXXXXXX",
+                pack="PACKXXXXXXXXXX"
+                )
         data = shipment.service.map_data(shipment=shipment)
         self.assertEqual(
             type(data),
@@ -105,7 +109,10 @@ class TestDeliveryModel(BlokTestCase):
         recipient_address = self.create_recipient_address()
         shipment = self.registry.Delivery.Shipment.insert(
                 service=colissimo, sender_address=sender_address,
-                recipient_address=recipient_address)
+                recipient_address=recipient_address, reason="ORDERXXXXXXXXXX",
+                pack="PACKXXXXXXXXXX"
+                )
+        response = shipment.create_label()
 
         with patch('anyblok_delivery.bloks.colissimo.colissimo.Colissimo'
                    '.create_label') as mock_post:

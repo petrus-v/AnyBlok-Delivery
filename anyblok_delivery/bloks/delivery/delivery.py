@@ -180,13 +180,15 @@ class Shipment(Mixin.UuidColumn, TrackModel):
                                  model=Declarations.Model.Address,
                                  column_names=["recipient_address_uuid"],
                                  nullable=False)
+    reason = String(label="Reason reference")
+    pack = String(label="Pack reference")
     status = Selection(label="Shipping status", selections=statuses,
                        default='new',
                        nullable=False)
     properties = Jsonb(label="Properties")
-    tracking_number = String()
-    document_uuid = UUID()
+    document_uuid = UUID(label="Carrier slip document reference")
     document = Function(fget='get_latest_document')
+    tracking_number = String(label="Carrier tracking number")
 
     def get_latest_document(self):
         Document = self.registry.Attachment.Document.Latest

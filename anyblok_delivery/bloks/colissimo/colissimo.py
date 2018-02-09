@@ -62,6 +62,7 @@ class Colissimo(Model.Delivery.Carrier.Service):
                     "service": {
                         "productCode": "%s" % self.product_code,
                         "depositDate": "%s" % deposit_date,
+                        "orderNumber": "%s %s" % (sh.reason, sh.pack),
                         },
                     "parcel": {
                         "weight": "1"
@@ -135,11 +136,18 @@ class Colissimo(Model.Delivery.Carrier.Service):
                 pdf,
                 'application/pdf'
             )
-            shipment.properties.update({
-                'sent': data,
-                'received': infos,
-            })
-            shipment.status = 'Label'
+            if not shipment.properties:
+                shipment.properties = {
+                    'sent': data,
+                    'received': infos,
+                }
+            else:
+                shipment.properties.update({
+                    'sent': data,
+                    'received': infos,
+                })
+            shipment.status = "label"
+            shipment.tracking_number = infos['labelResponse']['parcelNumber']
 
         res['status_code'] = req.status_code
         return res
