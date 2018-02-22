@@ -26,7 +26,7 @@ requirements = [
     'anyblok_postgres',
     'anyblok-pyramid-rest-api',
     'anyblok_attachment',
-    'pycountry',
+    'anyblok_address',
     'cryptography',
     'requests',
     'requests-toolbelt'

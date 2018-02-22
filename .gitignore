@@ -103,4 +103,7 @@ app.session
 # node
 node_modules
 
+# pycharm
+.idea
+
 # End of https://www.gitignore.io/api/python
