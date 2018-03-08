@@ -27,7 +27,6 @@ requirements = [
     'anyblok-pyramid-rest-api',
     'anyblok_attachment',
     'anyblok_address',
-    'pycountry',
     'cryptography',
     'requests',
     'requests-toolbelt'
