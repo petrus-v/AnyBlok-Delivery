@@ -6,8 +6,6 @@ from logging import getLogger
 
 import requests
 from requests_toolbelt.multipart import decoder
-from pycountry import countries
-
 from anyblok import Declarations
 
 
@@ -46,10 +44,8 @@ class Colissimo(Model.Delivery.Carrier.Service):
         # datetime formatting
         deposit_date = datetime.now().strftime("%Y-%m-%d")
         # 2 letters country code
-        sender_country = countries.get(
-                alpha_3=sh.sender_address.country).alpha_2
-        recipient_country = countries.get(
-                alpha_3=sh.recipient_address.country).alpha_2
+        sender_country = sh.sender_address.country.alpha_2
+        recipient_country = sh.recipient_address.country.alpha_2
 
         data = {"contractNumber": "%s" % self.credential.account_number,
                 "password": "%s" % self.credential.password,
