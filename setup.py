@@ -25,10 +25,10 @@ requirements = [
     'anyblok',
     'anyblok_mixins',
     'anyblok_postgres',
-    'anyblok-pyramid-rest-api',
     'anyblok_attachment',
     'anyblok_address',
     'cryptography',
+    'idna==v2.6',
     'requests',
     'requests-toolbelt'
 ]
@@ -39,7 +39,6 @@ test_requirements = [
 
 bloks = [
     'delivery=anyblok_delivery.bloks.delivery:DeliveryBlok',
-    # 'delivery_rest_api=anyblok_delivery.bloks.rest_api:DeliveryRestApiBlok',
     (
         'delivery_colissimo=anyblok_delivery.bloks.colissimo:'
         'DeliveryColissimoBlok'
