@@ -61,7 +61,7 @@ class Colissimo(Model.Delivery.Carrier.Service):
                         "orderNumber": "%s %s" % (sh.reason, sh.pack),
                         },
                     "parcel": {
-                        "weight": "1"
+                        "weight": "%s" % 0.3
                         },
                     "sender": {
                         "address": {
