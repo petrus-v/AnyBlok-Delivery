@@ -10,7 +10,6 @@ before_script:
   - find . -name '*.pyo' -exec rm -f {} +
   - find . -name '*~' -exec rm -f {} +
   - find . -name '__pycache__' -exec rm -fr {} +
-  - pip install setuptools==v37.0.0
   - pip install --upgrade pip wheel
   - pip install -r requirements.test.txt
   - dropdb anyblok_delivery_test || true
@@ -20,4 +19,3 @@ test_script:
   script:
     - flake8 anyblok_delivery --max-line-length=80
     - anyblok_nose -c tests.cfg -- -v -s anyblok_delivery
-
