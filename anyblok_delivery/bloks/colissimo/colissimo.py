@@ -74,8 +74,9 @@ class Colissimo(Model.Delivery.Carrier.Service):
                             "line2": "%s" % sh.sender_address.street1,
                             "line3": "%s" % sh.sender_address.street2,
                             "countryCode": "%s" % sender_country,
-                            "city": "%s" % sh.sender_address.city,
-                            "zipCode": "%s" % sh.sender_address.zip_code,
+                            "city": "%s" % sh.sender_address.city.strip(),
+                            "zipCode": "%s" % (
+                                sh.sender_address.zip_code.strip()),
                             }
                         },
                     "addressee": {
@@ -91,8 +92,9 @@ class Colissimo(Model.Delivery.Carrier.Service):
                             "line2": "%s" % sh.recipient_address.street1,
                             "line3": "%s" % sh.recipient_address.street2,
                             "countryCode": "%s" % recipient_country,
-                            "city": "%s" % sh.recipient_address.city,
-                            "zipCode": "%s" % sh.recipient_address.zip_code,
+                            "city": "%s" % sh.recipient_address.city.strip(),
+                            "zipCode": "%s" % (
+                                sh.recipient_address.zip_code.strip()),
                             }
                         }
                     }
