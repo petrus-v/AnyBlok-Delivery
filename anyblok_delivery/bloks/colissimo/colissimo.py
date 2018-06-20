@@ -124,8 +124,10 @@ class Colissimo(Model.Delivery.Carrier.Service):
                 infos = json.loads(part.content.decode())
 
         if req.status_code == 400:
-            res['errors'] = infos['messages']
+            raise Exception(infos['messages'])
         elif req.status_code == 200:
+            del data['contractNumber']
+            del data['password']
             res['infos'] = infos
             res['pdf'] = pdf
             shipment.save_document(
