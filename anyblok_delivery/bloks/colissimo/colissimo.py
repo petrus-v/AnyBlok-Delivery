@@ -151,3 +151,14 @@ class Colissimo(Model.Delivery.Carrier.Service):
 
         res['status_code'] = req.status_code
         return res
+
+    def get_label_status(self, shipment=None):
+        url = (
+            "https://www.coliposte.fr/tracking-chargeur-cxf"
+            "/TrackingServiceWS/track")
+        data = {"accountNumber": "%s" % self.credential.account_number,
+                "password": "%s" % self.credential.password,
+                "skybillNumber": shipment.tracking_number}
+        req = requests.get(url, data)
+        print(req)
+        # TODO parse req update

@@ -110,6 +110,11 @@ class Service(Mixin.UuidColumn, Mixin.TrackModel):
                         "is Forbidden. Please use a specialized one like "
                         "Colissimo, Dhl, etc...")
 
+    def get_label_status(self, *args, **kwargs):
+        raise Exception("Update the status of the label directly from "
+                        "Carrier.Service class is Forbidden. Please use "
+                        "a specialized one like Colissimo, Dhl, etc...")
+
 
 @Declarations.register(Model.Delivery)
 class Shipment(Mixin.UuidColumn, Mixin.TrackModel):
@@ -160,6 +165,22 @@ class Shipment(Mixin.UuidColumn, Mixin.TrackModel):
         if not self.status == 'new':
             return
         return self.service.create_label(shipment=self)
+
+    def get_label_status(self):
+        """Retrieve a shipping label from shipping service
+        """
+        if not self.service:
+            return
+        if self.status in ('new', 'delivered', 'exception'):
+            return
+        return self.service.get_label_status(shipment=self)
+
+    @classmethod
+    def get_labels_status(cls):
+        status = ['label', 'transit']
+        shipments = cls.query().filter(cls.status.in_(status)).all()
+        for shipment in shipments:
+            shipment.get_label_status()
 
     def save_document(self, binary_file, content_type):
         document = self.document
