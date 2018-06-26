@@ -56,6 +56,10 @@ setup(
     packages=find_packages(),
     entry_points={
         'bloks': bloks,
+        'console_scripts': [
+            ('anyblok_update_labels_status=anyblok_delivery.scripts:'
+             'update_labels_status'),
+        ],
     },
     include_package_data=True,
     install_requires=requirements,
