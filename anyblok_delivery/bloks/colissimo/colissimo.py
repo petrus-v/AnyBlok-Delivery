@@ -167,11 +167,13 @@ class Colissimo(Model.Delivery.Carrier.Service):
         if res['errorCode'] != '0':
             raise Exception(res['errorMessage'])
 
-        if 'events' not in shipment.properties:
-            shipment.properties['events'] = {}
+        properties = shipment.properties.copy()
+        if 'events' not in properties:
+            properties['events'] = {}
 
-        if res['eventDate'] in shipment.properties['events']:
+        if res['eventDate'] in properties['events']:
             return
 
-        shipment.properties['events'][res['eventDate']] = res
+        properties['events'][res['eventDate']] = res
+        shipment.properties = properties
         shipment.status = eventCodes[res['eventCode']]
