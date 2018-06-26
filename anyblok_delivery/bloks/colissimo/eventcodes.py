@@ -128,5 +128,9 @@ eventCodes = {
     # d'acheminement
     "PCHCEX": "transit",
     # Le colis est retourné à l'expéditeur
-    "SOLREI": "exception"
+    "SOLREI": "exception",
+    # "Votre colis n'a pas pu être récupéré car il n'était pas présent dans la
+    # boite à lettres. Vous pouvez le déposer en bureau en poste ou chez un
+    # commerçant du réseau La Poste."
+    "ENEMQT": "exception",
 }

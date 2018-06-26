@@ -25,4 +25,9 @@ def update_labels_status():
     """
     registry = anyblok.start('update_labels_status')
     if registry:
-        registry.Delivery.Shipment.get_labels_status()
+        try:
+            registry.Delivery.Shipment.get_labels_status()
+        finally:
+            registry.commit()
+
+        registry.close()

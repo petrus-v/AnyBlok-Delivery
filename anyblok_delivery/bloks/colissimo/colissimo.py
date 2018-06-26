@@ -176,4 +176,8 @@ class Colissimo(Model.Delivery.Carrier.Service):
 
         properties['events'][res['eventDate']] = res
         shipment.properties = properties
-        shipment.status = eventCodes[res['eventCode']]
+        try:
+            shipment.status = eventCodes[res['eventCode']]
+        except KeyError:
+            logger.exception("%r" % res)
+            raise
