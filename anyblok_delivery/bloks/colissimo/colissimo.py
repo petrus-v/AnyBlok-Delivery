@@ -7,6 +7,8 @@ from logging import getLogger
 import requests
 from requests_toolbelt.multipart import decoder
 from anyblok import Declarations
+from lxml import etree
+from .eventcodes import eventCodes
 
 
 logger = getLogger(__name__)
@@ -160,5 +162,16 @@ class Colissimo(Model.Delivery.Carrier.Service):
                 "password": "%s" % self.credential.password,
                 "skybillNumber": shipment.tracking_number}
         req = requests.get(url, data)
-        print(req)
-        # TODO parse req update
+        response = etree.fromstring(req.text)[0][0][0]  # ugly but only way
+        res = {x.tag: x.text for x in response}
+        if res['errorCode'] != '0':
+            raise Exception(res['errorMessage'])
+
+        if 'events' not in shipment.properties:
+            shipment.properties['events'] = {}
+
+        if res['eventDate'] in shipment.properties['events']:
+            return
+
+        shipment.properties['events'][res['eventDate']] = res
+        shipment.status = eventCodes[res['eventCode']]
