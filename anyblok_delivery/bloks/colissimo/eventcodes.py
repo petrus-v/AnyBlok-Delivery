@@ -133,4 +133,9 @@ eventCodes = {
     # boite à lettres. Vous pouvez le déposer en bureau en poste ou chez un
     # commerçant du réseau La Poste."
     "ENEMQT": "exception",
+    # Votre colis n'a pu être livré car le destinataire était absent. Il sera
+    # remis en livraison le prochain jour ouvré. Le destinataire peut se rendre
+    # sur laposte.fr/modification-livraison pour donner de nouvelles
+    # instructions.
+    'RENARV': 'transit',
 }
