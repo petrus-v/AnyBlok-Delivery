@@ -121,7 +121,8 @@ class Shipment(Mixin.UuidColumn, Mixin.TrackModel):
     """ Shipment
     """
     statuses = dict(new="New", label="Label", transit="Transit",
-                    delivered="Delivered", exception="Exception")
+                    delivered="Delivered", exception="Exception",
+                    returned="Returned to the expeditor")
     service = Many2One(label="Shipping service",
                        model=Declarations.Model.Delivery.Carrier.Service,
                        one2many='shipments',
@@ -171,13 +172,13 @@ class Shipment(Mixin.UuidColumn, Mixin.TrackModel):
         """
         if not self.service:
             return
-        if self.status in ('new', 'delivered', 'exception'):
+        if self.status in ('new', 'delivered', 'returned'):
             return
         return self.service.get_label_status(shipment=self)
 
     @classmethod
     def get_labels_status(cls):
-        status = ['label', 'transit']
+        status = ['label', 'transit', 'exception']
         shipments = cls.query().filter(cls.status.in_(status)).all()
         for shipment in shipments:
             shipment.get_label_status()
