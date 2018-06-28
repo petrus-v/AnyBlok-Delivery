@@ -155,6 +155,7 @@ class Colissimo(Model.Delivery.Carrier.Service):
         return res
 
     def get_label_status(self, shipment=None):
+        logger.info('Get label status for %r', shipment)
         url = (
             "https://www.coliposte.fr/tracking-chargeur-cxf"
             "/TrackingServiceWS/track")
@@ -170,14 +171,23 @@ class Colissimo(Model.Delivery.Carrier.Service):
         properties = shipment.properties.copy()
         if 'events' not in properties:
             properties['events'] = {}
+        else:
+            properties['events'] = properties['events'].copy()
 
         if res['eventDate'] in properties['events']:
             return
 
-        properties['events'][res['eventDate']] = res
-        shipment.properties = properties
         try:
-            shipment.status = eventCodes[res['eventCode']]
+            status = eventCodes[res['eventCode']]
+            shipment.status = status
+            properties['events'][res['eventDate']] = {
+                'eventDate': res['eventDate'],
+                'eventStatus': status,
+                'eventLibelle': res['eventLibelle'],
+            }
+            shipment.properties = properties
+            self.registry.flush()
+            logger.info('%r status : %r', shipment, status)
         except KeyError:
             logger.exception("%r" % res)
             raise

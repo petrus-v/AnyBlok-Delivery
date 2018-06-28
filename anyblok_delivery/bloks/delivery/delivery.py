@@ -150,14 +150,6 @@ class Shipment(Mixin.UuidColumn, Mixin.TrackModel):
         query = Document.query().filter_by(uuid=self.document_uuid)
         return query.one_or_none()
 
-    def __str__(self):
-        return ('{self.uuid}').format(self=self)
-
-    def __repr__(self):
-        msg = ('<Shipment: {self.uuid}>')
-
-        return msg.format(self=self)
-
     def create_label(self):
         """Retrieve a shipping label from shipping service
         """
