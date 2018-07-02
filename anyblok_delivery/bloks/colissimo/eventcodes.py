@@ -140,4 +140,6 @@ eventCodes = {
     'RENARV': 'transit',
     # Votre colis sera présenté le prochain jour ouvré.
     'QDICFM': 'transit',
+    # Votre colis va être récupéré dans votre boite aux lettres aujourd'hui.
+    'EMLCFM': 'label',
 }
