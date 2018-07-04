@@ -148,4 +148,7 @@ eventCodes = {
     # Votre colis est livré au voisin indiqué sur l'avis déposé dans la boîte
     # aux lettres du destinataire.
     "LIVVOI": "delivered",
+    # Votre colis ne peut être livré ce jour, l'accès à l'adresse de livraison
+    # étant impossible. Il sera remis en livraison au plus tôt
+    "RSTFMA": "transit",
 }
