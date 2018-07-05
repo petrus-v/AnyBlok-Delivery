@@ -151,4 +151,7 @@ eventCodes = {
     # Votre colis ne peut être livré ce jour, l'accès à l'adresse de livraison
     # étant impossible. Il sera remis en livraison au plus tôt
     "RSTFMA": "transit",
+    # Votre colis a été déposé après l'heure limite de dépôt. Il sera expédié
+    # dès le prochain jour ouvré.
+    "PCHTAR": "transit",
 }
