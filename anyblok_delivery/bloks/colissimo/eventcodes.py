@@ -154,4 +154,7 @@ eventCodes = {
     # Votre colis a été déposé après l'heure limite de dépôt. Il sera expédié
     # dès le prochain jour ouvré.
     "PCHTAR": "transit",
+    # Votre colis sera livré sur rendez-vous à la date choisie par le
+    # destinataire.
+    "RSTDIL": "transit",
 }
