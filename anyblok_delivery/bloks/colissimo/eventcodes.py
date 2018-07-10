@@ -157,4 +157,6 @@ eventCodes = {
     # Votre colis sera livré sur rendez-vous à la date choisie par le
     # destinataire.
     "RSTDIL": "transit",
+    # Votre colis est en cours de livraison en point de retrait.
+    "MLVCFM": "transit",
 }
