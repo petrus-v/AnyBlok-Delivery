@@ -159,4 +159,6 @@ eventCodes = {
     "RSTDIL": "transit",
     # Votre colis est en cours de livraison en point de retrait.
     "MLVCFM": "transit",
+    # Votre colis a été récupéré dans votre boite aux lettres
+    "ECHCFM": 'transit',
 }
