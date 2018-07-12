@@ -183,7 +183,7 @@ class Shipment(Mixin.UuidColumn, Mixin.TrackModel):
             )
             self.document_uuid = document.uuid
 
-        document.file = binary_file
+        document.set_file(binary_file)
         document.filesize = len(binary_file)
         document.contenttype = content_type
         hash = hashlib.sha256()
