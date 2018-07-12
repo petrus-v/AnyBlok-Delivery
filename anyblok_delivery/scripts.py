@@ -8,6 +8,9 @@
 import anyblok
 from anyblok.release import version
 from anyblok.config import Configuration
+from logging import getLogger
+
+logger = getLogger(__name__)
 
 Configuration.add_application_properties(
     'update_labels_status',
@@ -20,14 +23,22 @@ Configuration.add_application_properties(
 )
 
 
+status = ['label', 'transit', 'exception']
+
+
 def update_labels_status():
     """Execute a script or open an interpreter
     """
     registry = anyblok.start('update_labels_status')
     if registry:
-        try:
-            registry.Delivery.Shipment.get_labels_status()
-        finally:
-            registry.commit()
+        Shipment = registry.Delivery.Shipment
+        query = Shipment.query()
+        query = query.filter(Shipment.status.in_(status))
+        for ship in query.all():
+            try:
+                ship.Delivery.Shipment.get_label_status()
+            except Exception as e:
+                logger.exception('failed to get label')
 
+        registry.commit()
         registry.close()
