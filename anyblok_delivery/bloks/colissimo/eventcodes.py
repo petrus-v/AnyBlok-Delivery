@@ -161,4 +161,7 @@ eventCodes = {
     "MLVCFM": "transit",
     # Votre colis a été récupéré dans votre boite aux lettres
     "ECHCFM": 'transit',
+    # L'emballage de votre colis a été renforcé pour en assurer sa livraison.
+    # Il est en cours d'acheminement.
+    "CHGRCA": "exception",
 }
