@@ -127,7 +127,7 @@ class Colissimo(Model.Delivery.Carrier.Service):
                       "application/json")):
                 infos = json.loads(part.content.decode())
 
-        if req.status_code == 400:
+        if req.status_code in (400, 500):
             raise Exception(infos['messages'])
         elif req.status_code == 200:
             del data['contractNumber']
