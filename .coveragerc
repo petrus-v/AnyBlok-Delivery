@@ -2,6 +2,8 @@
 omit =
     # omit scripts file
     anyblok_delivery/scripts.py
+    # omit anything in a tests directory anywhere
+    */tests/*
 
 [report]
 # Regexes for lines to exclude from consideration
