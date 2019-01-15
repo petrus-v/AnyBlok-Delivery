@@ -35,6 +35,7 @@ env:
     - ANYBLOK_DATABASE_NAME=travis_ci_test
     - ANYBLOK_DATABASE_DRIVER=postgresql
     - ANYBLOK_DATABASE_USER=postgres
+    - ANYBLOK_ENCRYPT_KEY=tests
 
 script:
   - flake8 anyblok_delivery --ignore F999
