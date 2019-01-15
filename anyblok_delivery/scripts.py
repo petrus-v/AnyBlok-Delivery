@@ -38,7 +38,7 @@ def update_labels_status():
         for ship in query.all():
             try:
                 ship.Delivery.Shipment.get_label_status()
-            except Exception as e:
+            except Exception:
                 logger.exception('failed to get label')
 
         registry.commit()
