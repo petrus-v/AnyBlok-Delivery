@@ -18,19 +18,13 @@ services:
   - postgresql
 
 install:
-  - pip install -U pip
-  # only eggs: do an erreur with wheel
-  - if [[ $TRAVIS_PYTHON_VERSION == '3.7-dev' ]]; then pip install python_editor texttable PyYAML; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == 'nightly' ]]; then pip install python_editor texttable PyYAML; fi
-  - pip install wheel
   - pip install psycopg2 sqlalchemy
-  - pip install anyblok
   - pip install flake8
   - pip install coverage
   - pip install nose
   - pip install WebTest
   - pip install coveralls
-  - python setup.py develop
+  - pip install .
 
 env:
   global:
