@@ -31,7 +31,7 @@ requirements = [
     'anyblok_attachment',
     'anyblok_address',
     'cryptography',
-    'idna==v2.6',
+    'idna',
     'requests',
     'requests-toolbelt'
 ]
