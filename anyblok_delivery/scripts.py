@@ -1,12 +1,13 @@
-# This file is a part of the AnyBlok project
+# This file is a part of the AnyBlok / Delivery project
 #
+#    Copyright (C) 2018 Franck Bret <franckbret@gmail.com>
 #    Copyright (C) 2018 Jean-Sebastien SUZANNE <jssuzanne@anybox.fr>
 #
 # This Source Code Form is subject to the terms of the Mozilla Public License,
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
 import anyblok
-from anyblok.release import version
+from anyblok_delivery.release import version
 from anyblok.config import Configuration
 from logging import getLogger
 

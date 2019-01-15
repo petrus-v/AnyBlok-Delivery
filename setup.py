@@ -1,13 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-"""Setup script for anyblok_delivery"""
+# This file is a part of the AnyBlok / Delivery project
+#
+#    Copyright (C) 2018 Franck Bret <franckbret@gmail.com>
+#    Copyright (C) 2018 Jean-Sebastien SUZANNE <jssuzanne@anybox.fr>
+#
+# This Source Code Form is subject to the terms of the Mozilla Public License,
+# v. 2.0. If a copy of the MPL was not distributed with this file,You can
+# obtain one at http://mozilla.org/MPL/2.0/.
 
 from setuptools import setup, find_packages
 import os
 
 
 here = os.path.abspath(os.path.dirname(__file__))
+version = '1.0.0'
 
 with open(os.path.join(here, 'README.rst'),
           'r', encoding='utf-8') as readme_file:
@@ -16,10 +23,6 @@ with open(os.path.join(here, 'README.rst'),
 with open(os.path.join(here, 'CHANGELOG.rst'),
           'r', encoding='utf-8') as changelog_file:
     changelog = changelog_file.read()
-
-with open(os.path.join(here, 'VERSION'),
-          'r', encoding='utf-8') as version_file:
-    version = version_file.read().strip()
 
 requirements = [
     'anyblok',
@@ -51,8 +54,8 @@ setup(
     description="Carrier delivery management",
     long_description=readme + '\n\n' + changelog,
     author="Franck Bret",
-    author_email='f.bret@sensee.com',
-    url='https://github.com/franckbret/anyblok_delivery',
+    author_email='franckbret@gmail.com',
+    url='https://github.com/AnyBlok/AnyBlok-Delivery',
     packages=find_packages(),
     entry_points={
         'bloks': bloks,

@@ -1,9 +1,6 @@
 sqlalchemy
 psycopg2
 anyblok
-anyblok_address==1.2.1
-anyblok_mixins==1.0.0
-anyblok_attachment==1.1.1
 -e .
 flake8
 coverage
