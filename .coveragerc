@@ -1,0 +1,14 @@
+[run]
+omit =
+    # omit scripts file
+    anyblok_delivery/scripts.py
+
+[report]
+# Regexes for lines to exclude from consideration
+exclude_lines =
+    # unexecuting logger
+    logger\.
+    # exclude all import error of unloaded module
+    except ImportError:
+    # exclude all in reload import
+    def reload_declaration_module(cls, reload):
