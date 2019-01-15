@@ -73,7 +73,7 @@ class TestDeliveryModel(BlokTestCase):
         ca_cred = self.registry.Delivery.Carrier.Credential.insert(
                     account_number="123",
                     password="password")
-        service = self.registry.Delivery.Carrier.Service.Colissimo.insert(
+        service = self.registry.Delivery.Carrier.Service.insert(
                     name="Livraison à domicile", product_code="DOM",
                     carrier=ca, credential=ca_cred)
         return service
@@ -138,3 +138,13 @@ class TestDeliveryModel(BlokTestCase):
         self.assertEqual(shipment.document.contenttype, content_type)
         self.assertEqual(shipment.document.filesize, len(binary_file))
         self.assertTrue(shipment.document.hash)
+
+    def test_service_create_label(self):
+        service = self.create_carrier_service()
+        with self.assertRaises(Exception):
+            service.create_label()
+
+    def test_service_get_labels_status(self):
+        service = self.create_carrier_service()
+        with self.assertRaises(Exception):
+            service.get_label_status()
