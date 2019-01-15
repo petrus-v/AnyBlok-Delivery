@@ -30,7 +30,7 @@ eventCodes = {
     # Votre colis a été livré au gardien ou voisin
     "LIVRTI": "delivered",
     # Le colis est livré à l'expéditeur suite à un retour
-    "LIVREO": "returned",
+    "LIVREO": "error",
     # Le destinataire était absent lors de la livraison. Votre colis sera
     # présenté une nouvelle fois le prochain jour ouvré
     "RENNRV": "transit",
@@ -39,7 +39,7 @@ eventCodes = {
     # sur Internet, afin de fournir les compléments nécessaires
     "RENAIN": "exception",
     # Le colis est retourné à l'expéditeur suite à un refus du destinataire
-    "RENAVA": "returned",
+    "RENAVA": "error",
     # Votre colis est disponible dans votre bureau de poste. Le destinataire
     # dispose de 10 jours ouvrés pour retirer son colis sur présentation de
     # son bon de retrait et d'une pièce d'identité
@@ -52,19 +52,19 @@ eventCodes = {
     "RENCAD": "exception",
     # Le destinataire du colis n'habite pas à l'adresse indiquée. Le colis est
     # retourné à l'expéditeur
-    "RENDIA": "returned",
+    "RENDIA": "error",
     # Le colis est retourné à l'expéditeur suite à un refus du destinataire
-    "RENDIV": "returned",
+    "RENDIV": "error",
     # Le colis est réexpédié à la demande du destinataire vers l'adresse de
     # son choix
     "RENLNA": "transit",
     # Le colis est retourné à l'expéditeur suite à un refus du destinataire
-    "RENSNC": "returned",
+    "RENSNC": "error",
     # Le colis est retourné à l'expéditeur. Le destinataire a refusé de payer
     # le contre-remboursement
-    "RENSRB": "returned",
+    "RENSRB": "error",
     # Le colis est retourné à l'expéditeur suite à un refus du destinataire
-    "RENTAR": "returned",
+    "RENTAR": "error",
     # Votre colis est disponible au bureau de poste. Le destinataire, une fois
     # l'avis d'instance reçu, dispose de 10 jours ouvrés pour retirer le
     # colis sur présentation d'une pièce d'identité
@@ -75,7 +75,7 @@ eventCodes = {
     # Votre colis est en attente de distribution et sera livré prochainement
     "RSTNCG": "transit",
     # Le colis est retourné à l'expéditeur
-    "SOLREO": "returned",
+    "SOLREO": "error",
     # Votre colis est arrivé en France
     "CHGCFM": "transit",
     # Votre colis est arrivé dans le pays de destination

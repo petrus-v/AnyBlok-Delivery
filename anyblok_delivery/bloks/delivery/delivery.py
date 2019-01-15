@@ -37,14 +37,6 @@ class Carrier(Mixin.UuidColumn, Mixin.TrackModel):
     name = String(label="Name", nullable=False)
     code = String(label="Code", unique=True, nullable=False)
 
-    def __str__(self):
-        return ('{self.name}').format(self=self)
-
-    def __repr__(self):
-        msg = ('<Carrier: {self.name} - {self.code}>')
-
-        return msg.format(self=self)
-
 
 @Declarations.register(Model.Delivery.Carrier)
 class Credential(Mixin.UuidColumn, Mixin.TrackModel):
@@ -53,14 +45,6 @@ class Credential(Mixin.UuidColumn, Mixin.TrackModel):
     """
     account_number = String(label="Account Number")
     password = String(label="Password", encrypt_key=True)
-
-    def __str__(self):
-        return ('{self.account_number}').format(self=self)
-
-    def __repr__(self):
-        msg = ('<Carrier.Credential: {self.account_number}>')
-
-        return msg.format(self=self)
 
 
 @Declarations.register(Model.Delivery.Carrier)
@@ -82,13 +66,6 @@ class Service(Mixin.UuidColumn, Mixin.TrackModel):
                           nullable=False)
     properties = Jsonb(label="Properties")
     carrier_code = Selection(selections='get_carriers')
-
-    def __str__(self):
-        return ('{self.name}').format(self=self)
-
-    def __repr__(self):
-        msg = ('<Carrier.Service.{self.carrier_code.label}: {self.name}>')
-        return msg.format(self=self)
 
     @classmethod
     def define_mapper_args(cls):
@@ -128,7 +105,7 @@ class Shipment(Mixin.UuidColumn, Mixin.TrackModel):
     """
     statuses = dict(new="New", label="Label", transit="Transit",
                     delivered="Delivered", exception="Exception",
-                    returned="Returned to the expeditor")
+                    error="Error")
     service = Many2One(label="Shipping service",
                        model=Declarations.Model.Delivery.Carrier.Service,
                        one2many='shipments',
@@ -170,7 +147,7 @@ class Shipment(Mixin.UuidColumn, Mixin.TrackModel):
         """
         if not self.service:
             return
-        if self.status in ('new', 'delivered', 'returned'):
+        if self.status in ('new', 'delivered', 'error'):
             return
         return self.service.get_label_status(shipment=self)
 

@@ -19,6 +19,19 @@ class DeliveryBlok(Blok):
     author = "Franck BRET"
     required = ['attachment', 'address', 'anyblok-mixins']
 
+    def pre_migration(self, latest_version):
+        if latest_version is None:
+            return
+
+        if latest_version < '1.2.0':
+            logger.info('Start migration to rename status returned')
+            self.registry.execute("""
+                UPDATE delivery_shipment
+                SET status = 'error'
+                WHERE statue = 'returned';
+            """)
+            logger.info('Migration finished to rename status')
+
     @classmethod
     def import_declaration_module(cls):
         from . import delivery # noqa
