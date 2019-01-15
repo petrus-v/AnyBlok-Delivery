@@ -148,3 +148,31 @@ class TestDeliveryModel(BlokTestCase):
         service = self.create_carrier_service()
         with self.assertRaises(Exception):
             service.get_label_status()
+
+    def test_shipment_create_label(self):
+        sender_address = self.create_sender_address()
+        recipient_address = self.create_recipient_address()
+        service = self.create_carrier_service()
+        shipment = self.registry.Delivery.Shipment.insert(
+                service=service, sender_address=sender_address,
+                recipient_address=recipient_address)
+        shipment.status = 'label'
+        self.assertIsNone(shipment.create_label())
+
+    def test_shipment_get_label_status(self):
+        sender_address = self.create_sender_address()
+        recipient_address = self.create_recipient_address()
+        service = self.create_carrier_service()
+        shipment = self.registry.Delivery.Shipment.insert(
+                service=service, sender_address=sender_address,
+                recipient_address=recipient_address)
+        self.assertIsNone(shipment.get_label_status())
+
+    def test_shipment_get_labels_status(self):
+        sender_address = self.create_sender_address()
+        recipient_address = self.create_recipient_address()
+        service = self.create_carrier_service()
+        self.registry.Delivery.Shipment.insert(
+                service=service, sender_address=sender_address,
+                recipient_address=recipient_address)
+        self.assertIsNone(self.registry.Delivery.Shipment.get_labels_status())

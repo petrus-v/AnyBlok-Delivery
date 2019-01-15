@@ -136,19 +136,17 @@ class Shipment(Mixin.UuidColumn, Mixin.TrackModel):
     def create_label(self):
         """Retrieve a shipping label from shipping service
         """
-        if not self.service:
-            return
         if not self.status == 'new':
             return
+
         return self.service.create_label(shipment=self)
 
     def get_label_status(self):
         """Retrieve a shipping label from shipping service
         """
-        if not self.service:
-            return
         if self.status in ('new', 'delivered', 'error'):
             return
+
         return self.service.get_label_status(shipment=self)
 
     @classmethod
