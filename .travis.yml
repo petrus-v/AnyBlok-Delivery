@@ -35,8 +35,10 @@ env:
 
 script:
   - flake8 anyblok_delivery
-  - anyblok_createdb --install-all-bloks
-  - nosetests anyblok_delivery/bloks --with-anyblok-bloks -v -s --with-coverage --cover-package=anyblok_delivery
+  - anyblok_createdb --install-bloks delivery
+  - nosetests anyblok_delivery/bloks/delivery/tests --with-anyblok-bloks -v -s --with-coverage --cover-package=anyblok_delivery
+  - anyblok_createdb --install-bloks colissimo
+  - nosetests anyblok_delivery/bloks/colissimo/tests --with-anyblok-bloks -v -s --with-coverage --cover-package=anyblok_delivery
   
 after_success:
   coveralls
