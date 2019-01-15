@@ -35,7 +35,7 @@ env:
 
 script:
   - flake8 anyblok_delivery
-  - anyblok_createdb --install-bloks delivery colissimo
+  - anyblok_createdb --install-bloks delivery delivery_colissimo
   - nosetests anyblok_delivery/bloks/ --with-anyblok-bloks -v -s --with-coverage --cover-package=anyblok_delivery
   
 after_success:
