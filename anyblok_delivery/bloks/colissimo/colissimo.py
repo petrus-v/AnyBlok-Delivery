@@ -18,6 +18,9 @@ from .eventcodes import eventCodes
 
 
 logger = getLogger(__name__)
+NEW_LABEL_URL = "https://ws.colissimo.fr/sls-ws/SlsServiceWSRest/generateLabel"
+UPDATE_LABEL_URL = (
+    "https://www.coliposte.fr/tracking-chargeur-cxf/TrackingServiceWS/track")
 Model = Declarations.Model
 
 
@@ -110,10 +113,7 @@ class Colissimo(Model.Delivery.Carrier.Service):
         return data
 
     def create_label_query(self, data):
-        url = \
-            "https://ws.colissimo.fr/sls-ws/SlsServiceWSRest/generateLabel"
-        req = requests.post(url, json=data)
-
+        req = requests.post(NEW_LABEL_URL, json=data)
         # Parse multipart response
         multipart_data = decoder.MultipartDecoder.from_response(req)
         pdf = b''
@@ -165,21 +165,21 @@ class Colissimo(Model.Delivery.Carrier.Service):
         res['status_code'] = status_code
         return res
 
+    def get_label_status_query(self, data):
+        req = requests.get(UPDATE_LABEL_URL, data)
+        response = etree.fromstring(req.text)[0][0][0]  # ugly but only way
+        return {x.tag: x.text for x in response}
+
     def get_label_status(self, shipment=None):
         logger.info('Get label status for %r', shipment)
-        url = (
-            "https://www.coliposte.fr/tracking-chargeur-cxf"
-            "/TrackingServiceWS/track")
         data = {"accountNumber": "%s" % self.credential.account_number,
                 "password": "%s" % self.credential.password,
                 "skybillNumber": shipment.tracking_number}
-        req = requests.get(url, data)
-        response = etree.fromstring(req.text)[0][0][0]  # ugly but only way
-        res = {x.tag: x.text for x in response}
+        res = self.get_label_status_query(data)
         if res['errorCode'] != '0':
             raise Exception(res['errorMessage'])
 
-        properties = shipment.properties.copy()
+        properties = shipment.properties.copy() if shipment.properties else {}
         if 'events' not in properties:
             properties['events'] = {}
         else:

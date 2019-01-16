@@ -7,6 +7,7 @@
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
 from os import urandom
+from datetime import datetime
 from unittest.mock import patch
 from anyblok.tests.testcase import BlokTestCase
 
@@ -151,3 +152,21 @@ class TestDeliveryModel(BlokTestCase):
             mock_post.return_value = (status_code, pdf, infos)
             with self.assertRaises(Exception):
                 shipment.create_label()
+
+    def test_get_label_status_error_code_0(self):
+        colissimo = self.create_carrier_service_colissimo()
+        sender_address = self.create_sender_address()
+        recipient_address = self.create_recipient_address()
+        shipment = self.registry.Delivery.Shipment.insert(
+                service=colissimo, sender_address=sender_address,
+                recipient_address=recipient_address, reason="ORDERXXXXXXXXXX",
+                pack="PACKXXXXXXXXXX", status='label'
+                )
+
+        with patch('anyblok_delivery.bloks.colissimo.colissimo.Colissimo'
+                   '.get_label_status_query') as mock_post:
+            mock_post.return_value = {
+                'errorCode': '0', 'eventDate': datetime.now().isoformat(),
+                'eventCode': 'DEPGUI', 'eventLibelle': 'Test'}
+            shipment.get_label_status()
+            self.assertEqual(shipment.status, 'delivered')
