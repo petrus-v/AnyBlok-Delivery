@@ -28,7 +28,7 @@ class DeliveryBlok(Blok):
             self.registry.execute("""
                 UPDATE delivery_shipment
                 SET status = 'error'
-                WHERE statue = 'returned';
+                WHERE status = 'returned';
             """)
             logger.info('Migration finished to rename status')
 
