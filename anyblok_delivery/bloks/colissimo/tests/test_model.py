@@ -162,7 +162,6 @@ class TestDeliveryModel(BlokTestCase):
                 recipient_address=recipient_address, reason="ORDERXXXXXXXXXX",
                 pack="PACKXXXXXXXXXX", status='label'
                 )
-        shipment.refresh()
 
         with patch('anyblok_delivery.bloks.colissimo.colissimo.Colissimo'
                    '.get_label_status_query') as mock_post:
