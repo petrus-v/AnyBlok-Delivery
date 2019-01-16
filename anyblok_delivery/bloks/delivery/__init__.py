@@ -8,6 +8,7 @@
 # obtain one at http://mozilla.org/MPL/2.0/.
 from anyblok.blok import Blok
 from anyblok_delivery.release import version
+from sqlalchemy.engine.reflection import Inspector
 from logging import getLogger
 logger = getLogger(__name__)
 
@@ -24,6 +25,12 @@ class DeliveryBlok(Blok):
             return
 
         if latest_version < '1.2.0':
+            table = self.registry.migration.table('delivery_shipment')
+            inspector = Inspector(self.registry.migration.conn)
+            for check in inspector.get_check_constraints('delivery_shipment'):
+                if check['name'].startswith('anyblok_ck_d_shipment__status_'):
+                    table.check(check['name']).drop()
+
             logger.info('Start migration to rename status returned')
             self.registry.execute("""
                 UPDATE delivery_shipment
