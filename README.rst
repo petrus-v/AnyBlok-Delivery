@@ -1,6 +1,5 @@
-==============
 Anyblok Delivery
-==============
+================
 
 Delivery management
 
@@ -17,6 +16,14 @@ Author
 Franck Bret 
 f.bret@sensee.com
 https://github.com/franckbret
+
+Contributors
+------------
+
+Jean-Sébastien Suzanne
+jssuzanne@anybox.fr
+https://github.com/jssuzanne
+https://github.com/AnyBlok
 
 Credits
 -------
