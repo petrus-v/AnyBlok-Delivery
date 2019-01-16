@@ -6,6 +6,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public License,
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
+from os import urandom
 from unittest.mock import patch
 from anyblok.tests.testcase import BlokTestCase
 
@@ -65,30 +66,6 @@ class TestDeliveryModel(BlokTestCase):
             1
         )
 
-    # def test_carrier_service_colissimo_shipment(self):
-    #     colissimo = self.create_carrier_service_colissimo()
-    #     sender_address = self.create_sender_address()
-    #     recipient_address = self.create_recipient_address()
-    #     shipment = self.registry.Delivery.Shipment.insert(
-    #             service=colissimo, sender_address=sender_address,
-    #             recipient_address=recipient_address,
-    #             reason="ORDERXXXXXXXXXX",
-    #             pack="PACKXXXXXXXXXX"
-    #             )
-
-    #     self.assertEqual(
-    #         shipment.service.carrier.code,
-    #         "COLISSIMO"
-    #     )
-    #     self.assertEqual(
-    #         shipment.service.product_code,
-    #         "DOM"
-    #     )
-    #     self.assertEqual(
-    #         type(shipment.create_label()),
-    #         dict
-    #     )
-
     def test_map_data(self):
         colissimo = self.create_carrier_service_colissimo()
         sender_address = self.create_sender_address()
@@ -112,7 +89,7 @@ class TestDeliveryModel(BlokTestCase):
             "FR"
         )
 
-    def test_create_label(self):
+    def test_create_label_200(self):
         colissimo = self.create_carrier_service_colissimo()
         sender_address = self.create_sender_address()
         recipient_address = self.create_recipient_address()
@@ -123,11 +100,54 @@ class TestDeliveryModel(BlokTestCase):
                 )
 
         with patch('anyblok_delivery.bloks.colissimo.colissimo.Colissimo'
-                   '.create_label') as mock_post:
-            mock_post.return_value = dict(status_code=200)
+                   '.create_label_query') as mock_post:
+            status_code = 200
+            pdf = urandom(100)
+            infos = {'labelResponse': {'parcelNumber': '6A track number'}}
+            mock_post.return_value = (status_code, pdf, infos)
             response = shipment.create_label()
 
             self.assertEqual(
                 response['status_code'],
                 200
             )
+            self.assertEqual(shipment.status, 'label')
+            self.assertEqual(shipment.document.get_file()['file'], pdf)
+
+    def test_create_label_400(self):
+        colissimo = self.create_carrier_service_colissimo()
+        sender_address = self.create_sender_address()
+        recipient_address = self.create_recipient_address()
+        shipment = self.registry.Delivery.Shipment.insert(
+                service=colissimo, sender_address=sender_address,
+                recipient_address=recipient_address, reason="ORDERXXXXXXXXXX",
+                pack="PACKXXXXXXXXXX"
+                )
+
+        with patch('anyblok_delivery.bloks.colissimo.colissimo.Colissimo'
+                   '.create_label_query') as mock_post:
+            status_code = 400
+            pdf = urandom(0)
+            infos = {'messages': dict()}
+            mock_post.return_value = (status_code, pdf, infos)
+            with self.assertRaises(Exception):
+                shipment.create_label()
+
+    def test_create_label_500(self):
+        colissimo = self.create_carrier_service_colissimo()
+        sender_address = self.create_sender_address()
+        recipient_address = self.create_recipient_address()
+        shipment = self.registry.Delivery.Shipment.insert(
+                service=colissimo, sender_address=sender_address,
+                recipient_address=recipient_address, reason="ORDERXXXXXXXXXX",
+                pack="PACKXXXXXXXXXX"
+                )
+
+        with patch('anyblok_delivery.bloks.colissimo.colissimo.Colissimo'
+                   '.create_label_query') as mock_post:
+            status_code = 500
+            pdf = urandom(0)
+            infos = {'messages': dict()}
+            mock_post.return_value = (status_code, pdf, infos)
+            with self.assertRaises(Exception):
+                shipment.create_label()

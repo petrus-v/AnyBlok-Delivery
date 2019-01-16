@@ -109,12 +109,10 @@ class Colissimo(Model.Delivery.Carrier.Service):
                 }
         return data
 
-    def create_label(self, shipment=None):
+    def create_label_query(self, data):
         url = \
             "https://ws.colissimo.fr/sls-ws/SlsServiceWSRest/generateLabel"
-        data = self.map_data(shipment)
         req = requests.post(url, json=data)
-        res = dict()
 
         # Parse multipart response
         multipart_data = decoder.MultipartDecoder.from_response(req)
@@ -133,9 +131,16 @@ class Colissimo(Model.Delivery.Carrier.Service):
                       "application/json")):
                 infos = json.loads(part.content.decode())
 
-        if req.status_code in (400, 500):
+        return (req.status_code, pdf, infos)
+
+    def create_label(self, shipment=None):
+        data = self.map_data(shipment)
+        res = dict()
+        status_code, pdf, infos = self.create_label_query(data)
+
+        if status_code in (400, 500):
             raise Exception(infos['messages'])
-        elif req.status_code == 200:
+        elif status_code == 200:
             del data['contractNumber']
             del data['password']
             res['infos'] = infos
@@ -157,7 +162,7 @@ class Colissimo(Model.Delivery.Carrier.Service):
             shipment.status = "label"
             shipment.tracking_number = infos['labelResponse']['parcelNumber']
 
-        res['status_code'] = req.status_code
+        res['status_code'] = status_code
         return res
 
     def get_label_status(self, shipment=None):
