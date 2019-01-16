@@ -7,7 +7,8 @@
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
 import json
-from datetime import datetime
+import pytz
+from datetime import datetime, timedelta
 from logging import getLogger
 
 import requests
@@ -172,18 +173,33 @@ class Colissimo(Model.Delivery.Carrier.Service):
 
     def get_label_status(self, shipment=None):
         logger.info('Get label status for %r', shipment)
-        data = {"accountNumber": "%s" % self.credential.account_number,
-                "password": "%s" % self.credential.password,
-                "skybillNumber": shipment.tracking_number}
-        res = self.get_label_status_query(data)
-        if res['errorCode'] != '0':
-            raise Exception(res['errorMessage'])
 
         properties = shipment.properties.copy() if shipment.properties else {}
         if 'events' not in properties:
             properties['events'] = {}
         else:
             properties['events'] = properties['events'].copy()
+
+        if not shipment.create_date.tzinfo:
+            shipment.refresh('create_date')
+
+        now = pytz.UTC.localize(datetime.utcnow())
+        if now - shipment.create_date > timedelta(days=90):
+            res = {
+                'errorCode': '0',
+                'eventCode': 'TIMEOUT',
+                'eventDate': now.isoformat(),
+                'eventLibelle': 'Colis datant de plus de 90 jours'
+            }
+        else:
+
+            data = {"accountNumber": "%s" % self.credential.account_number,
+                    "password": "%s" % self.credential.password,
+                    "skybillNumber": shipment.tracking_number}
+            res = self.get_label_status_query(data)
+
+        if res['errorCode'] != '0':
+            raise Exception(res['errorMessage'])
 
         if res['eventDate'] in properties['events']:
             return

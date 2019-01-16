@@ -7,6 +7,9 @@
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
 eventCodes = {
+    # Colis datant de plus de 90 jours
+    'TIMEOUT': 'error',  # code provenant anyblok_delivery
+
     # Votre colis est prêt à être expédié. Il n'est pas encore pris en charge
     # par La Poste
     "COMCFM": "label",

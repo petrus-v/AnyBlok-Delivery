@@ -7,7 +7,7 @@
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
 from os import urandom
-from datetime import datetime
+from datetime import datetime, timedelta
 from unittest.mock import patch
 from anyblok.tests.testcase import BlokTestCase
 
@@ -162,6 +162,7 @@ class TestDeliveryModel(BlokTestCase):
                 recipient_address=recipient_address, reason="ORDERXXXXXXXXXX",
                 pack="PACKXXXXXXXXXX", status='label'
                 )
+        shipment.refresh()
 
         with patch('anyblok_delivery.bloks.colissimo.colissimo.Colissimo'
                    '.get_label_status_query') as mock_post:
@@ -170,3 +171,21 @@ class TestDeliveryModel(BlokTestCase):
                 'eventCode': 'DEPGUI', 'eventLibelle': 'Test'}
             shipment.get_label_status()
             self.assertEqual(shipment.status, 'delivered')
+
+    def test_get_label_status_more_than_90_days(self):
+        colissimo = self.create_carrier_service_colissimo()
+        sender_address = self.create_sender_address()
+        recipient_address = self.create_recipient_address()
+        shipment = self.registry.Delivery.Shipment.insert(
+                service=colissimo, sender_address=sender_address,
+                recipient_address=recipient_address, reason="ORDERXXXXXXXXXX",
+                pack="PACKXXXXXXXXXX", status='label',
+                create_date=datetime.utcnow() - timedelta(days=91))
+
+        with patch('anyblok_delivery.bloks.colissimo.colissimo.Colissimo'
+                   '.get_label_status_query') as mock_post:
+            mock_post.return_value = {
+                'errorCode': '0', 'eventDate': datetime.now().isoformat(),
+                'eventCode': 'DEPGUI', 'eventLibelle': 'Test'}
+            shipment.get_label_status()
+            self.assertEqual(shipment.status, 'error')

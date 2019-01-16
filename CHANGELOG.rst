@@ -13,6 +13,12 @@ Refactored
 
 * ``returned`` status was renamed ``error``, to not create status each time
 
+Fixed
+-----
+
+* When a pack have been created for more than 90 days, then the status is now replaced
+  by ``error`` status.
+
 1.0.0 [2018-07-07]
 ==================
 
