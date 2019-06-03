@@ -37,7 +37,7 @@ def update_labels_status():
         query = query.filter(Shipment.status.in_(status))
         for ship in query.all():
             try:
-                ship.Delivery.Shipment.get_label_status()
+                ship.get_label_status()
             except Exception:
                 logger.exception('failed to get label')
 
