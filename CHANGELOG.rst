@@ -12,6 +12,14 @@ Fixed
 
 * script to update label
 
+Added
+~~~~~
+
+* Colissimo adapter to format address in function of the country
+  - FRA: default if the adapter does not exist
+  - BEL
+  - CHE
+
 1.2.0 (2019-01-16)
 ------------------
 
