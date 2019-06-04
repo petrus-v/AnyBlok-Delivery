@@ -55,62 +55,32 @@ class Colissimo(Model.Delivery.Carrier.Service):
         sh = shipment
         # datetime formatting
         deposit_date = datetime.now().strftime("%Y-%m-%d")
-        # 2 letters country code
-        sender_country = sh.sender_address.country.alpha_2
-        recipient_country = sh.recipient_address.country.alpha_2
 
-        data = {"contractNumber": "%s" % self.credential.account_number,
-                "password": "%s" % self.credential.password,
-                "outputFormat": {
-                    "x": "0",
-                    "y": "0",
-                    "outputPrintingType": "PDF_A4_300dpi"
-                    },
-                "letter": {
-                    "service": {
-                        "productCode": "%s" % self.product_code,
-                        "depositDate": "%s" % deposit_date,
-                        "orderNumber": "%s %s" % (sh.reason, sh.pack),
-                        },
-                    "parcel": {
-                        "weight": "%s" % 0.3
-                        },
-                    "sender": {
-                        "address": {
-                            "companyName": "%s" %
-                            sh.sender_address.company_name,
-                            "firstName": "%s" % sh.sender_address.first_name,
-                            "lastName": "%s" % sh.sender_address.last_name,
-                            "line0": "",
-                            "line1": "",
-                            "line2": "%s" % sh.sender_address.street1,
-                            "line3": "%s" % sh.sender_address.street2,
-                            "countryCode": "%s" % sender_country,
-                            "city": "%s" % sh.sender_address.city.strip(),
-                            "zipCode": "%s" % (
-                                sh.sender_address.zip_code.strip()),
-                            }
-                        },
-                    "addressee": {
-                        "address": {
-                            "companyName": "%s" %
-                            sh.recipient_address.company_name,
-                            "firstName": "%s" %
-                            sh.recipient_address.first_name,
-                            "lastName": "%s" %
-                            sh.recipient_address.last_name,
-                            "line0": "",
-                            "line1": "",
-                            "line2": "%s" % sh.recipient_address.street1,
-                            "line3": "%s" % sh.recipient_address.street2,
-                            "countryCode": "%s" % recipient_country,
-                            "city": "%s" % sh.recipient_address.city.strip(),
-                            "zipCode": "%s" % (
-                                sh.recipient_address.zip_code.strip()),
-                            }
-                        }
-                    }
+        data = {
+            "contractNumber": "%s" % self.credential.account_number,
+            "password": "%s" % self.credential.password,
+            "outputFormat": {
+                "x": "0",
+                "y": "0",
+                "outputPrintingType": "PDF_A4_300dpi"
+                },
+            "letter": {
+                "service": {
+                    "productCode": "%s" % self.product_code,
+                    "depositDate": "%s" % deposit_date,
+                    "orderNumber": "%s %s" % (sh.reason, sh.pack),
+                },
+                "parcel": {
+                    "weight": "%s" % 0.3
+                },
+                "sender": {
+                    "address": sh.sender_address.get_colissimo(),
+                },
+                "addressee": {
+                    "address": sh.recipient_address.get_colissimo(),
                 }
+            }
+        }
         return data
 
     def create_label_query(self, data):
