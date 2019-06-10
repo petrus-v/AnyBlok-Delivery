@@ -15,7 +15,7 @@ import os
 
 
 here = os.path.abspath(os.path.dirname(__file__))
-version = '1.2.0'
+version = '1.2.1'
 
 with open(os.path.join(here, 'README.rst'),
           'r', encoding='utf-8') as readme_file:
