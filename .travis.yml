@@ -7,9 +7,26 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
-  - "3.6-dev" # 3.6 development branch
   - "3.7-dev" # 3.7 development branch
+  - "3.8-dev" # 3.8 development branch
   - "nightly"
+
+env:
+  global:
+    - ANYBLOK_DATABASE_NAME=travis_ci_test
+    - ANYBLOK_DATABASE_USER=postgres
+    - ANYBLOK_DATABASE_DRIVER=postgresql
+    - ANYBLOK_ENCRYPT_KEY=tests
+
+matrix:
+    include:
+      - python: "pypy3.5"
+        env: ANYBLOK_DATABASE_DRIVER=postgresql+psycopg2cffi
+    allow_failures:
+      - python: "3.7-dev"
+      - python: "3.8-dev"
+      - python: "nightly"
+      - python: "pypy3.5"
 
 virtualenv:
   system_site_packages: false
@@ -18,20 +35,15 @@ services:
   - postgresql
 
 install:
-  - pip install psycopg2 sqlalchemy
+  - pip install -U pip
+  - pip install wheel
+  - if [[ $TRAVIS_PYTHON_VERSION == 'pypy3.5' ]]; then pip install psycopg2cffi; else pip install psycopg2; fi
+  - pip install sqlalchemy
   - pip install flake8
   - pip install coverage
   - pip install nose
-  - pip install WebTest
   - pip install coveralls
   - pip install .
-
-env:
-  global:
-    - ANYBLOK_DATABASE_NAME=travis_ci_test
-    - ANYBLOK_DATABASE_DRIVER=postgresql
-    - ANYBLOK_DATABASE_USER=postgres
-    - ANYBLOK_ENCRYPT_KEY=tests
 
 script:
   - flake8 anyblok_delivery
