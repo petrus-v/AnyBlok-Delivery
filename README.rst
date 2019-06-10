@@ -64,17 +64,17 @@ Bloks
 Author
 ------
 
-Franck Bret 
-f.bret@sensee.com
-https://github.com/franckbret
+* Franck Bret 
+** franckbret@gmail.com
+** https://github.com/franckbret
 
 Contributors
 ------------
 
-Jean-Sébastien Suzanne
-js.suzanne@gmail.com
-https://github.com/jssuzanne
-https://github.com/AnyBlok
+* Jean-Sébastien Suzanne
+** js.suzanne@gmail.com
+** https://github.com/jssuzanne
+** https://github.com/AnyBlok
 
 Credits
 -------
