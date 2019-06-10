@@ -14,12 +14,13 @@ Anyblok Delivery
 .. image:: https://img.shields.io/pypi/pyversions/anyblok_delivery.svg?longCache=True
     :alt: Python versions
 
-.. image:: https://travis-ci.org/AnyBlok/anyblok_delivery.svg?branch=master
-    :target: https://travis-ci.org/AnyBlok/anyblok_delivery
+.. image:: https://travis-ci.org/AnyBlok/AnyBlok-Delivery.svg?branch=master
+    :target: https://travis-ci.org/AnyBlok/AnyBlok-Delivery
+    :alt: Build status
 
 .. image:: https://coveralls.io/repos/github/AnyBlok/AnyBlok-Delivery/badge.svg?branch=master
     :target: https://coveralls.io/github/AnyBlok/AnyBlok-Delivery?branch=master
-    :alt: Coverage
+    :alt: Coverage status
 
 .. image:: https://img.shields.io/pypi/v/anyblok_delivery.svg
    :target: https://pypi.python.org/pypi/anyblok_delivery/
