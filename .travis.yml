@@ -44,7 +44,8 @@ install:
 
 script:
   - flake8 anyblok_delivery
-  - anyblok_createdb --install-bloks delivery delivery_colissimo
+  - psql -c 'create database travis_ci_test;' -U postgres
+  - anyblok_updatedb --install-bloks delivery delivery_colissimo
   - py.test --cov-report= --cov=anyblok_delivery  anyblok_delivery/bloks/
   
 after_success:
