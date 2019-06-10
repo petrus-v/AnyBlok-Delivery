@@ -4,8 +4,8 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-1.2.1
------
+1.3.0 (2019-06-10)
+------------------
 
 Fixed
 ~~~~~
@@ -19,6 +19,11 @@ Added
   - FRA: default if the adapter does not exist
   - BEL
   - CHE
+
+Refactored
+~~~~~~~~~~
+
+* Unittest: Replaced dependencies of nose by pytest
 
 1.2.0 (2019-01-16)
 ------------------
