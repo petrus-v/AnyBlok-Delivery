@@ -10,7 +10,6 @@
 import pytest
 from os import urandom
 from uuid import uuid1
-import anyblok_delivery.testing  # noqa
 
 
 @pytest.mark.usefixtures('rollback_registry')

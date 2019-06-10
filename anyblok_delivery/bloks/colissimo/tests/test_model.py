@@ -11,7 +11,6 @@ import pytest
 from os import urandom
 from datetime import datetime, timedelta
 from unittest.mock import patch
-import anyblok_delivery.testing  # noqa
 
 
 @pytest.mark.usefixtures('rollback_registry')
