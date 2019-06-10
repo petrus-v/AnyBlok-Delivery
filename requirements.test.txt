@@ -4,6 +4,7 @@ anyblok
 -e .
 flake8
 coverage
-WebTest
+pytest
+pytest-cov
 sphinx
 sphinxcontrib-httpdomain
