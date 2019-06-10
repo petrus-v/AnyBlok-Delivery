@@ -2,18 +2,25 @@
 #
 #    Copyright (C) 2018 Franck Bret <franckbret@gmail.com>
 #    Copyright (C) 2018 Jean-Sebastien SUZANNE <jssuzanne@anybox.fr>
+#    Copyright (C) 2019 Jean-Sebastien SUZANNE <js.suzanne@gmail.com>
 #
 # This Source Code Form is subject to the terms of the Mozilla Public License,
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
+import pytest
 from os import urandom
 from datetime import datetime, timedelta
 from unittest.mock import patch
-from anyblok.tests.testcase import BlokTestCase
+import anyblok_delivery.testing  # noqa
 
 
-class TestDeliveryModel(BlokTestCase):
+@pytest.mark.usefixtures('rollback_registry')
+class TestDeliveryModel:
     """ Test delivery model"""
+
+    @pytest.fixture(autouse=True)
+    def init_registry(self, rollback_registry):
+        self.registry = rollback_registry
 
     def create_carrier_service_colissimo(self):
         ca = self.registry.Delivery.Carrier.insert(
@@ -52,20 +59,10 @@ class TestDeliveryModel(BlokTestCase):
 
     def test_carrier_service_colissimo(self):
         colissimo = self.create_carrier_service_colissimo()
-        self.assertEqual(
-            colissimo.carrier.code,
-            "COLISSIMO"
-        )
-
-        self.assertEqual(
-            len(self.registry.Delivery.Carrier.Service.query().all()),
-            1
-        )
-        self.assertEqual(
-            len(self.registry.Delivery.Carrier.Service.Colissimo.query(
-            ).all()),
-            1
-        )
+        assert colissimo.carrier.code == "COLISSIMO"
+        assert len(self.registry.Delivery.Carrier.Service.query().all()) == 1
+        Delivery = self.registry.Delivery
+        assert Delivery.Carrier.Service.Colissimo.query().count() == 1
 
     def test_map_data(self):
         colissimo = self.create_carrier_service_colissimo()
@@ -77,18 +74,9 @@ class TestDeliveryModel(BlokTestCase):
                 pack="PACKXXXXXXXXXX"
                 )
         data = shipment.service.map_data(shipment=shipment)
-        self.assertEqual(
-            type(data),
-            dict
-        )
-        self.assertEqual(
-            data['letter']['service']['productCode'],
-            "DOM"
-        )
-        self.assertEqual(
-            data['letter']['sender']['address']['countryCode'],
-            "FR"
-        )
+        assert type(data) is dict
+        assert data['letter']['service']['productCode'] == "DOM"
+        assert data['letter']['sender']['address']['countryCode'] == "FR"
 
     def test_create_label_200(self):
         colissimo = self.create_carrier_service_colissimo()
@@ -108,12 +96,9 @@ class TestDeliveryModel(BlokTestCase):
             mock_post.return_value = (status_code, pdf, infos)
             response = shipment.create_label()
 
-            self.assertEqual(
-                response['status_code'],
-                200
-            )
-            self.assertEqual(shipment.status, 'label')
-            self.assertEqual(shipment.document.get_file()['file'], pdf)
+            assert response['status_code'] == 200
+            assert shipment.status == 'label'
+            assert shipment.document.get_file()['file'] == pdf
 
     def test_create_label_400(self):
         colissimo = self.create_carrier_service_colissimo()
@@ -131,7 +116,7 @@ class TestDeliveryModel(BlokTestCase):
             pdf = urandom(0)
             infos = {'messages': dict()}
             mock_post.return_value = (status_code, pdf, infos)
-            with self.assertRaises(Exception):
+            with pytest.raises(Exception):
                 shipment.create_label()
 
     def test_create_label_500(self):
@@ -150,7 +135,7 @@ class TestDeliveryModel(BlokTestCase):
             pdf = urandom(0)
             infos = {'messages': dict()}
             mock_post.return_value = (status_code, pdf, infos)
-            with self.assertRaises(Exception):
+            with pytest.raises(Exception):
                 shipment.create_label()
 
     def test_get_label_status_error_code_0(self):
@@ -169,7 +154,7 @@ class TestDeliveryModel(BlokTestCase):
                 'errorCode': '0', 'eventDate': datetime.now().isoformat(),
                 'eventCode': 'DEPGUI', 'eventLibelle': 'Test'}
             shipment.get_label_status()
-            self.assertEqual(shipment.status, 'delivered')
+            assert shipment.status == 'delivered'
 
     def test_get_label_status_more_than_90_days(self):
         colissimo = self.create_carrier_service_colissimo()
@@ -187,4 +172,4 @@ class TestDeliveryModel(BlokTestCase):
                 'errorCode': '0', 'eventDate': datetime.now().isoformat(),
                 'eventCode': 'DEPGUI', 'eventLibelle': 'Test'}
             shipment.get_label_status()
-            self.assertEqual(shipment.status, 'error')
+            assert shipment.status == 'error'
