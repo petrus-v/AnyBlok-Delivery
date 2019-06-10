@@ -10,11 +10,16 @@
 import pytest
 from os import urandom
 from uuid import uuid1
+import anyblok_delivery.testing  # noqa
 
 
 @pytest.mark.usefixtures('rollback_registry')
 class TestDeliveryModel:
     """ Test delivery model"""
+
+    @pytest.fixture(autouse=True)
+    def init_registry(self, rollback_registry):
+        self.registry = rollback_registry
 
     def create_sender_address(self):
         address = self.registry.Address.insert(
