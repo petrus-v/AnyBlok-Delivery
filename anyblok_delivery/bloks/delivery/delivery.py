@@ -54,7 +54,7 @@ class Service(Mixin.UuidColumn, Mixin.TrackModel):
     """
     CARRIER_CODE = None
 
-    name = String(label="Name", nullable=False)
+    name = String(label="Name", nullable=False, size=128)
     product_code = String(label="Product code", unique=True, nullable=False)
     carrier = Many2One(label="Name",
                        model=Declarations.Model.Delivery.Carrier,
@@ -126,12 +126,20 @@ class Shipment(Mixin.UuidColumn, Mixin.TrackModel):
     properties = Jsonb(label="Properties")
     document_uuid = UUID(label="Carrier slip document reference")
     document = Function(fget='get_latest_document')
+    cn23_document_uuid = UUID(label="Carrier slip document reference")
+    cn23_document = Function(fget='get_latest_cn23_document')
     tracking_number = String(label="Carrier tracking number")
 
-    def get_latest_document(self):
+    def _get_latest_cocument(self, document_uuid):
         Document = self.registry.Attachment.Document.Latest
-        query = Document.query().filter_by(uuid=self.document_uuid)
+        query = Document.query().filter_by(uuid=document_uuid)
         return query.one_or_none()
+
+    def get_latest_document(self):
+        return self._get_latest_cocument(self.document_uuid)
+
+    def get_latest_cn23_document(self):
+        return self._get_latest_cocument(self.cn23_document_uuid)
 
     def create_label(self):
         """Retrieve a shipping label from shipping service
@@ -156,14 +164,7 @@ class Shipment(Mixin.UuidColumn, Mixin.TrackModel):
         for shipment in shipments:
             shipment.get_label_status()
 
-    def save_document(self, binary_file, content_type):
-        document = self.document
-        if document is None:
-            document = self.registry.Attachment.Document.insert(
-                data={'shipment': str(self.uuid)}
-            )
-            self.document_uuid = document.uuid
-
+    def _save_document(self, document, binary_file, content_type):
         document.set_file(binary_file)
         document.filesize = len(binary_file)
         document.contenttype = content_type
@@ -172,3 +173,23 @@ class Shipment(Mixin.UuidColumn, Mixin.TrackModel):
         document.hash = hash.digest()
 
         self.registry.flush()  # flush to update version in document
+
+    def save_document(self, binary_file, content_type):
+        document = self.document
+        if document is None:
+            document = self.registry.Attachment.Document.insert(
+                data={'shipment': str(self.uuid)}
+            )
+            self.document_uuid = document.uuid
+
+        self._save_document(document, binary_file, content_type)
+
+    def save_cn23_document(self, binary_file, content_type):
+        document = self.cn23_document
+        if document is None:
+            document = self.registry.Attachment.Document.insert(
+                data={'shipment': str(self.uuid)}
+            )
+            self.cn23_document_uuid = document.uuid
+
+        self._save_document(document, binary_file, content_type)

@@ -7,13 +7,24 @@
 # obtain one at http://mozilla.org/MPL/2.0/.
 from logging import getLogger
 from anyblok import Declarations
+from sqlalchemy_utils.types.phone_number import PhoneNumberType
 
 
 logger = getLogger(__name__)
 
 
-def fr_adater(address):
-    # TODO fix size. What append if the size is too large ?
+def convert_phone(phone, region):
+    if not phone:
+        return ''
+
+    if isinstance(phone, str):
+        PhoneNumber = PhoneNumberType(region=region, max_length=20).python_type
+        phone = PhoneNumber(phone, region)
+
+    return phone.international.replace(' ', '')
+
+
+def fr_adater(address, region):
     return {
         "companyName": address.company_name or '',
         "firstName": address.first_name or '',
@@ -25,13 +36,12 @@ def fr_adater(address):
         "countryCode": "%s" % address.country.alpha_2,
         "city": "%s" % address.city.strip(),
         "zipCode": "%s" % address.zip_code.strip(),
-        "mobileNumber": "%s" % address.phone1 or '',
-        "phoneNumber": "%s" % address.phone2 or '',
+        "mobileNumber": convert_phone(address.phone1, region),
+        "phoneNumber": convert_phone(address.phone2, region),
     }
 
 
-def be_adater(address):
-    # TODO fix size. What append if the size is too large ?
+def be_adater(address, region):
     return {
         "companyName": address.company_name or '',
         "firstName": address.first_name or '',
@@ -39,12 +49,12 @@ def be_adater(address):
         "line0": "",
         "line1": "",
         "line2": "%s - %s" % (address.street1, address.street2),
-        "line3": "" % address.street2,
+        "line3": "%s" % address.street2,
         "countryCode": "%s" % address.country.alpha_2,
         "city": "%s" % address.city.strip(),
         "zipCode": "%s" % address.zip_code.strip(),
-        "mobileNumber": "%s" % address.phone1 or '',
-        "phoneNumber": "%s" % address.phone2 or '',
+        "mobileNumber": convert_phone(address.phone1, region),
+        "phoneNumber": convert_phone(address.phone2, region),
     }
 
 
@@ -65,4 +75,4 @@ class Address:
 
     def get_colissimo(self):
         adapter = self.get_colissimo_adapter_for_country()
-        return adapter(self)
+        return adapter(self, self.country.alpha_2)

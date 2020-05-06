@@ -22,16 +22,8 @@ class TestDeliveryModel:
         self.registry = rollback_registry
 
     def create_carrier_service_colissimo(self):
-        ca = self.registry.Delivery.Carrier.insert(
-            name="Colissimo", code="COLISSIMO")
-        ca_cred = self.registry.Delivery.Carrier.Credential.insert(
-                    account_number="123",
-                    password="password")
-
-        service = self.registry.Delivery.Carrier.Service.Colissimo.insert(
-                    name="Livraison à domicile", product_code="DOM",
-                    carrier=ca, credential=ca_cred)
-        return service
+        return self.registry.Delivery.Carrier.Service.query().filter_by(
+            product_code='DOM').one()
 
     def create_sender_address(self):
         address = self.registry.Address.insert(
@@ -57,11 +49,9 @@ class TestDeliveryModel:
         return address
 
     def test_carrier_service_colissimo(self):
-        colissimo = self.create_carrier_service_colissimo()
-        assert colissimo.carrier.code == "COLISSIMO"
-        assert len(self.registry.Delivery.Carrier.Service.query().all()) == 1
+        assert len(self.registry.Delivery.Carrier.Service.query().all()) == 18
         Delivery = self.registry.Delivery
-        assert Delivery.Carrier.Service.Colissimo.query().count() == 1
+        assert Delivery.Carrier.Service.Colissimo.query().count() == 18
 
     def test_map_data(self):
         colissimo = self.create_carrier_service_colissimo()
@@ -91,8 +81,9 @@ class TestDeliveryModel:
                    '.create_label_query') as mock_post:
             status_code = 200
             pdf = urandom(100)
+            cn23 = urandom(100)
             infos = {'labelResponse': {'parcelNumber': '6A track number'}}
-            mock_post.return_value = (status_code, pdf, infos)
+            mock_post.return_value = (status_code, pdf, cn23, infos)
             response = shipment.create_label()
 
             assert response['status_code'] == 200
@@ -113,8 +104,9 @@ class TestDeliveryModel:
                    '.create_label_query') as mock_post:
             status_code = 400
             pdf = urandom(0)
+            cn23 = urandom(0)
             infos = {'messages': dict()}
-            mock_post.return_value = (status_code, pdf, infos)
+            mock_post.return_value = (status_code, pdf, cn23, infos)
             with pytest.raises(Exception):
                 shipment.create_label()
 
@@ -132,8 +124,9 @@ class TestDeliveryModel:
                    '.create_label_query') as mock_post:
             status_code = 500
             pdf = urandom(0)
+            cn23 = urandom(0)
             infos = {'messages': dict()}
-            mock_post.return_value = (status_code, pdf, infos)
+            mock_post.return_value = (status_code, pdf, cn23, infos)
             with pytest.raises(Exception):
                 shipment.create_label()
 

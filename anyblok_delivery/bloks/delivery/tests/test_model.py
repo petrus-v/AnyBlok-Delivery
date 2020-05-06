@@ -67,7 +67,7 @@ class TestDeliveryModel:
                     account_number="123",
                     password="password")
         service = self.registry.Delivery.Carrier.Service.insert(
-                    name="Livraison à domicile", product_code="DOM",
+                    name="Livraison à domicile", product_code="TEST",
                     carrier=ca, credential=ca_cred)
         return service
 
